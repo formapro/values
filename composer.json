@@ -1,8 +1,8 @@
 {
-  "name": "makasim/values-orm",
+  "name": "makasim/values",
   "type": "library",
-  "description": "Highly opinionated ORM. Simple&Fast.",
-  "keywords": ["orm", "mongo"],
+  "description": "Highly opinionated way of build Models",
+  "keywords": ["model", "mongo"],
   "license": "MIT",
   "authors": [
     {
@@ -11,8 +11,7 @@
     }
   ],
   "require": {
-    "php": ">=5.5.0",
-    "ext-mongo": "^1.2.12"
+    "php": ">=5.5.0"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.0"
@@ -21,7 +20,7 @@
     "bin-dir": "bin"
   },
   "autoload": {
-    "psr-4": { "Makasim\\ValuesORM\\": "" }
+    "psr-4": { "Makasim\\Values\\": "" }
   },
   "extra": {
     "branch-alias": {
