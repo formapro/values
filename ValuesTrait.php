@@ -1,5 +1,5 @@
 <?php
-namespace Makasim\ValuesORM;
+namespace Makasim\Values;
 
 trait ValuesTrait
 {
