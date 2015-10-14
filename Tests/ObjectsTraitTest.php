@@ -1,8 +1,8 @@
 <?php
-namespace Makasim\ValuesORM\Tests;
+namespace Makasim\Values\Tests;
 
-use Makasim\ValuesORM\ObjectsTrait;
-use Makasim\ValuesORM\ValuesTrait;
+use Makasim\Values\ObjectsTrait;
+use Makasim\Values\ValuesTrait;
 
 class ObjectsTraitTest extends \PHPUnit_Framework_TestCase
 {
