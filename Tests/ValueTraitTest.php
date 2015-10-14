@@ -1,7 +1,7 @@
 <?php
-namespace Makasim\ValuesORM\Tests;
+namespace Makasim\Values\Tests;
 
-use Makasim\ValuesORM\ValuesTrait;
+use Makasim\Values\ValuesTrait;
 
 class ValuesTraitTest extends \PHPUnit_Framework_TestCase
 {
