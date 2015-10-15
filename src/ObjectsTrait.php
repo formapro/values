@@ -54,10 +54,10 @@ trait ObjectsTrait
     protected function setObject($namespace, $key, $object)
     {
         if ($object) {
-            $this->values[$namespace][$key] = $object->getValues();
-            $this->changedValues[$namespace][$key] = $object->getValues();
+            $this->values[$namespace][$key] = get_values($object);
+            $this->changedValues[$namespace][$key] = get_values($object);
 
-            set_values_by_reference($object, $this->values[$namespace][$key]);
+            set_values($object, $this->values[$namespace][$key], true);
 
             $this->objects[$namespace][$key] = $object;
         } else {
@@ -110,10 +110,10 @@ trait ObjectsTrait
         $objectKey = count($this->values[$namespace][$key]);
 
         $this->objects[$namespace][$key][$objectKey] = $object;
-        $this->values[$namespace][$key][$objectKey] = $object->getValues();
-        $this->changedValues[$namespace][$key][$objectKey] = $object->getValues();
+        $this->values[$namespace][$key][$objectKey] = get_values($object);
+        $this->changedValues[$namespace][$key][$objectKey] = get_values($object);
 
-        set_values_by_reference($object, $this->values[$namespace][$key][$objectKey]);
+        set_values($object, $this->values[$namespace][$key][$objectKey], true);
     }
 
     /**
@@ -147,29 +147,4 @@ trait ObjectsTrait
 
         return $this->objects[$namespace][$key];
     }
-}
-
-function build_object($classOrClosure, array &$values, \Closure $objectBuilder = null)
-{
-    if ($classOrClosure instanceof \Closure) {
-        $class = $classOrClosure($values);
-    } else {
-        $class = (string) $classOrClosure;
-    }
-
-    $object = new $class();
-    set_values_by_reference($object, $values);
-
-    $objectBuilder && $objectBuilder($object);
-
-    return $object;
-}
-
-function set_values_by_reference($object, array &$values)
-{
-    $setValuesByReference = \Closure::bind(function ($object, array &$values) {
-        $object->values = &$values;
-    }, null, $object);
-
-    $setValuesByReference($object, $values);
 }

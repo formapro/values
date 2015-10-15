@@ -20,7 +20,11 @@
     "bin-dir": "bin"
   },
   "autoload": {
-    "psr-4": { "Makasim\\Values\\": "" }
+    "psr-4": { "Makasim\\Values\\": "src" },
+    "files": ["src/functions_include.php"]
+  },
+  "autoload0-dev": {
+    "psr-4": { "Makasim\\Values\\Tests": "tests" }
   },
   "extra": {
     "branch-alias": {

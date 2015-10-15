@@ -35,32 +35,11 @@ trait ValuesTrait
     }
 
     /**
-     * @return array
-     */
-    public function getValues()
-    {
-        return $this->values;
-    }
-
-    /**
-     * @param array $values
-     */
-    public function setValues(array $values)
-    {
-        $this->values = $values;
-        $this->changedValues = [];
-
-        if (property_exists($this, 'objects')) {
-            $this->objects = [];
-        }
-    }
-
-    /**
      * @param string $namespace
      * @param string $key
      * @param string $value
      */
-    public function addValue($namespace, $key, $value)
+    protected function addValue($namespace, $key, $value)
     {
         if ($value instanceof \DateTime) {
             $value = [
@@ -84,7 +63,7 @@ trait ValuesTrait
      * @param string $key
      * @param string $value
      */
-    public function setValue($namespace, $key, $value)
+    protected function setValue($namespace, $key, $value)
     {
         if ($value instanceof \DateTime) {
             $value = [
@@ -114,7 +93,7 @@ trait ValuesTrait
      *
      * @return mixed
      */
-    public function getValue($namespace, $key, $default = null, $castTo = null)
+    protected function getValue($namespace, $key, $default = null, $castTo = null)
     {
         if (false == array_key_exists($namespace, $this->values) || false == array_key_exists($key, $this->values[$namespace])) {
             return $default;
@@ -135,34 +114,5 @@ trait ValuesTrait
         }
 
         return $value;
-    }
-
-    /**
-     * @return array
-     */
-    public function getChangedValues()
-    {
-        $changedValues = $this->changedValues;
-
-        // hack I know
-        if (property_exists($this, 'objects')) {
-            foreach ($this->objects as $namespace => $namespaceValues) {
-                foreach ($namespaceValues as $name => $values) {
-                    if (is_array($values)) {
-                        foreach ($values as $valueKey => $value) {
-                            if (false == empty($value->getChangedValues())) {
-                                $changedValues[$namespace][$name][$valueKey] = $value->getChangedValues();
-                            }
-                        }
-                    } elseif (is_object($values)) {
-                        if (false == empty($values->getChangedValues())) {
-                            $changedValues[$namespace][$name] = $values->getChangedValues();
-                        }
-                    }
-                }
-            }
-        }
-
-        return $changedValues;
     }
 }

@@ -40,7 +40,7 @@ $order->setNumber('1234');
 $number = $order->getNumber();
 
 // get an order representation as an array. now you can store it (to mongo for example).
-$orderValues = $order->getValues();
+$orderValues = \Makasim\Values\get_values($order);
 ```
 
 Hydrate a model from an array:
@@ -52,7 +52,7 @@ $orderValues = [/* an array previously stored somewhere*/];
 
 // create new order
 $order = new Order;
-$order->setValues($orderValues);
+\Makasim\Values\set_values($order, $orderValues);
 
 $number = $order->getNumber();
 ```
@@ -122,7 +122,7 @@ $order->setPrice($price);
 
 
 // it contains all order values INCLUDING leaf models, in our case price ones.
-$orderValues = $order->getValues();
+$orderValues = \Makasim\Values\get_values($order);
 ```
 
 if you update values of leaf model they are update in order too:
@@ -139,7 +139,7 @@ $order->setPrice($price);
 $price->setAmount(200);
 
 // the values must contain price 200
-$orderValues = $order->getValues();
+$orderValues = \Makasim\Values\get_values($order);
 ```
 
 and you can easily hydrate your model from array:
@@ -148,7 +148,7 @@ and you can easily hydrate your model from array:
 <?php
 
 $order = new Order();
-$order->setValues($orderValues);
+\Makasim\Values\set_values($order, $orderValues);
 
 $price = $order->getPrice();
 
