@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/makasim/ValuesORM.png?branch=master)](https://travis-ci.org/makasim/ValuesORM)
+[![Build Status](https://travis-ci.org/makasim/values.png?branch=master)](https://travis-ci.org/makasim/values)
 
 # Values
 
