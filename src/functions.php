@@ -49,13 +49,15 @@ function get_changed_values($object)
                 foreach ($namespaceValues as $name => $values) {
                     if (is_array($values)) {
                         foreach ($values as $valueKey => $value) {
-                            if (false == empty(get_changed_values($value))) {
-                                $changedValues[$namespace][$name][$valueKey] = get_changed_values($value);
+                            $changed = get_changed_values($value);
+                            if (false == empty($changed)) {
+                                $changedValues[$namespace][$name][$valueKey] = $changed;
                             }
                         }
                     } elseif (is_object($values)) {
-                        if (false == empty(get_changed_values($values))) {
-                            $changedValues[$namespace][$name] = get_changed_values($values);
+                        $changed = get_changed_values($values);
+                        if (false == empty($changed)) {
+                            $changedValues[$namespace][$name] = $changed;
                         }
                     }
                 }
