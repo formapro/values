@@ -482,6 +482,64 @@ class ObjectsTraitTest extends \PHPUnit_Framework_TestCase
             ],
         ], \Makasim\Values\get_values($obj));
     }
+
+    public function testShouldAllowSetSelfObjectAndGetPreviouslySet()
+    {
+        $subObjFoo = new SubObjectTest();
+        $subObjFoo->setValue('aSubName', 'aSubKey', 'aFooVal');
+
+        $obj = new ObjectTest();
+        $obj->setSelfObject('aKey', $subObjFoo);
+
+        $this->assertSame($subObjFoo, $obj->getSelfObject('aKey', ObjectTest::class));
+        $this->assertSame(['self' => ['aKey' =>
+            ['aSubName' => ['aSubKey' => 'aFooVal']],
+        ]], \Makasim\Values\get_values($obj));
+        $this->assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], \Makasim\Values\get_values($subObjFoo));
+    }
+
+    public function testShouldAllowSetSelfObjectsAndGetPreviouslySet()
+    {
+        $subObjFoo = new SubObjectTest();
+        $subObjFoo->setValue('aSubName', 'aSubKey', 'aFooVal');
+
+        $subObjBar = new SubObjectTest();
+        $subObjBar->setValue('aSubName', 'aSubKey', 'aBarVal');
+
+        $obj = new ObjectTest();
+        $obj->setSelfObjects('aKey', [$subObjFoo, $subObjBar]);
+
+        $this->assertSame([$subObjFoo, $subObjBar], $obj->getSelfObjects('aKey', SubObjectTest::class));
+
+        $this->assertSame(['self' => ['aKey' => [
+            ['aSubName' => ['aSubKey' => 'aFooVal']],
+            ['aSubName' => ['aSubKey' => 'aBarVal']],
+        ]]], \Makasim\Values\get_values($obj));
+        $this->assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], \Makasim\Values\get_values($subObjFoo));
+        $this->assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], \Makasim\Values\get_values($subObjBar));
+    }
+
+    public function testShouldAllowAddSelfObjectsAndGetPreviouslySet()
+    {
+        $subObjFoo = new SubObjectTest();
+        $subObjFoo->setValue('aSubName', 'aSubKey', 'aFooVal');
+
+        $subObjBar = new SubObjectTest();
+        $subObjBar->setValue('aSubName', 'aSubKey', 'aBarVal');
+
+        $obj = new ObjectTest();
+        $obj->addSelfObject('aKey', $subObjFoo);
+        $obj->addSelfObject('aKey', $subObjBar);
+
+        $this->assertSame([$subObjFoo, $subObjBar], $obj->getSelfObjects('aKey', SubObjectTest::class));
+
+        $this->assertSame(['self' => ['aKey' => [
+            ['aSubName' => ['aSubKey' => 'aFooVal']],
+            ['aSubName' => ['aSubKey' => 'aBarVal']],
+        ]]], \Makasim\Values\get_values($obj));
+        $this->assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], \Makasim\Values\get_values($subObjFoo));
+        $this->assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], \Makasim\Values\get_values($subObjBar));
+    }
 }
 
 class ObjectTest
@@ -495,6 +553,12 @@ class ObjectTest
     }
 
     use ObjectsTrait {
+        setSelfObject as public;
+        getSelfObject as public;
+        setSelfObjects as public;
+        getSelfObjects as public;
+        addSelfObject as public;
+
         setObject as public;
         getObject as public;
         setObjects as public;
