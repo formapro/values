@@ -18,6 +18,56 @@ trait ObjectsTrait
     protected $objectBuilder;
 
     /**
+     * @param string      $key
+     * @param object|null $object
+     */
+    protected function setSelfObject($key, $object)
+    {
+        $this->setObject('self', $key, $object);
+    }
+
+    /**
+     * @param string          $key
+     * @param string|\Closure $classOrClosure
+     *
+     * @return object
+     */
+    protected function getSelfObject($key, $classOrClosure)
+    {
+        return $this->getObject('self', $key, $classOrClosure);
+    }
+
+    /**
+     * @param string   $key
+     * @param object[] $objects
+     */
+    protected function setSelfObjects($key, $objects)
+    {
+        $this->setObjects('self', $key, $objects);
+    }
+
+    /**
+     * @param string          $key
+     * @param string|\Closure $classOrClosure
+     *
+     * @return object[]
+     */
+    protected function getSelfObjects($key, $classOrClosure)
+    {
+        return $this->getObjects('self', $key, $classOrClosure);
+    }
+
+    /**
+     * @param string $key
+     * @param object $object
+     */
+    protected function addSelfObject($key, $object)
+    {
+        $this->addObject('self', $key, $object);
+    }
+
+
+    /**
      * @internal
      *
      * @param string $namespace
