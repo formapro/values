@@ -2,6 +2,8 @@
 
 # Values
 
+**DEPRECATED**: Use [https://github.com/makasim/yadm](https://github.com/makasim/yadm).
+
 This approach tries to gather the best from arrays and objects.
 You can store anything into an array, the array then could be easily converted to json, or saved in mongo.
 Objects can describe intention by their methods (getter or setters).
