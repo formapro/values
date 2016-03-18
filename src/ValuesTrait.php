@@ -70,6 +70,8 @@ trait ValuesTrait
                 'unix' => (int) $value->format('U'),
                 'iso' => (string) $value->format(DATE_ISO8601),
             ];
+        } elseif ($value instanceof \DateInterval) {
+            $value = $value->format('P%yY%mM%dDT%HH%IM%SS');
         }
 
         if (null !== $value) {
@@ -109,6 +111,8 @@ trait ValuesTrait
             } else {
                 $value = new \DateTime($value);
             }
+        } elseif ('date_interval' == $castTo) {
+            return new \DateInterval($value);
         } elseif ($castTo) {
             settype($value, $castTo);
         }
