@@ -14,11 +14,6 @@ trait ValuesTrait
     protected $hooks = [];
 
     /**
-     * @var array
-     */
-    protected $changedValues = [];
-
-    /**
      * @param string $key
      * @param string $value
      */
