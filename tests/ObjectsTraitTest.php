@@ -2,28 +2,28 @@
 namespace Makasim\Values\Tests;
 
 use function Makasim\Values\clone_object;
-use function Makasim\Values\get_object_values;
-use Makasim\Values\ObjectsTrait;
+use function Makasim\Values\get_values;
 use function Makasim\Values\get_object_changed_values;
-use function Makasim\Values\set_object_values;
-use Makasim\Values\ValuesTrait;
+use function Makasim\Values\set_values;
+use Makasim\Values\Tests\Model\Object;
+use Makasim\Values\Tests\Model\SubObject;
 use PHPUnit\Framework\TestCase;
 
 class ObjectsTraitTest extends TestCase
 {
     public function testShouldResetObjectIfValuesSetAgain()
     {
-        $subObj = new SubObjectTest();
+        $subObj = new SubObject();
         $subObj->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $obj = new ObjectTest();
+        $obj = new Object();
         $obj->setObject('aName.aKey', $subObj);
 
         self::assertAttributeNotEmpty('values', $obj);
         self::assertAttributeNotEmpty('objects', $obj);
 
         $values = [];
-        set_object_values($obj, $values);
+        set_values($obj, $values);
 
         self::assertAttributeEmpty('values', $obj);
         self::assertAttributeEmpty('objects', $obj);
@@ -31,100 +31,100 @@ class ObjectsTraitTest extends TestCase
 
     public function testShouldAllowGetPreviouslySetObject()
     {
-        $subObj = new SubObjectTest();
+        $subObj = new SubObject();
         $subObj->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $obj = new ObjectTest();
+        $obj = new Object();
         $obj->setObject('aName.aKey', $subObj);
 
-        self::assertSame($subObj, $obj->getObject('aName.aKey', SubObjectTest::class));
+        self::assertSame($subObj, $obj->getObject('aName.aKey', SubObject::class));
 
-        self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]], get_object_values($obj));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_object_values($subObj));
+        self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]], get_values($obj));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObj));
     }
 
     public function testShouldCreateObjectOnGet()
     {
-        $obj = new ObjectTest();
+        $obj = new Object();
 
         $values = ['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]];
-        set_object_values($obj, $values);
+        set_values($obj, $values);
 
-        $subObj = $obj->getObject('aName.aKey', SubObjectTest::class);
-        self::assertInstanceOf(SubObjectTest::class, $subObj);
+        $subObj = $obj->getObject('aName.aKey', SubObject::class);
+        self::assertInstanceOf(SubObject::class, $subObj);
 
-        self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]], get_object_values($obj));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_object_values($subObj));
+        self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]], get_values($obj));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObj));
     }
 
     public function testShouldReturnNullIfValueNotSet()
     {
-        $obj = new ObjectTest();
+        $obj = new Object();
 
-        self::assertNull($obj->getObject('aName.aKey', SubObjectTest::class));
+        self::assertNull($obj->getObject('aName.aKey', SubObject::class));
     }
 
     public function testShouldChangesInSubObjReflectedInObjValues()
     {
-        $subObj = new SubObjectTest();
+        $subObj = new SubObject();
         $subObj->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $obj = new ObjectTest();
+        $obj = new Object();
         $obj->setObject('aName.aKey', $subObj);
 
-        self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]], get_object_values($obj));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_object_values($subObj));
+        self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]], get_values($obj));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObj));
 
         $subObj->setValue('aSubName.aSubKey', 'aBarVal');
 
-        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_object_values($subObj));
-        self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aBarVal']]]], get_object_values($obj));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_values($subObj));
+        self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aBarVal']]]], get_values($obj));
     }
 
     public function testShouldChangesInSubSubObjReflectedInObjValues()
     {
-        $subSubObj = new SubObjectTest();
+        $subSubObj = new SubObject();
         $subSubObj->setValue('aSubSubName.aSubSubKey', 'aFooVal');
 
-        $subObj = new ObjectTest();
+        $subObj = new Object();
         $subObj->setObject('aSubName.aSubKey', $subSubObj);
 
-        $obj = new ObjectTest();
+        $obj = new Object();
         $obj->setObject('aName.aKey', $subObj);
 
         self::assertSame(['aName' => ['aKey' => [
             'aSubName' => [
                 'aSubKey' => ['aSubSubName' => ['aSubSubKey' => 'aFooVal']],
-            ], ]]], get_object_values($obj));
-        self::assertSame(['aSubSubName' => ['aSubSubKey' => 'aFooVal']], get_object_values($subSubObj));
+            ], ]]], get_values($obj));
+        self::assertSame(['aSubSubName' => ['aSubSubKey' => 'aFooVal']], get_values($subSubObj));
 
         $subSubObj->setValue('aSubSubName.aSubSubKey', 'aBarVal');
 
         self::assertSame(['aName' => ['aKey' => [
             'aSubName' => [
                 'aSubKey' => ['aSubSubName' => ['aSubSubKey' => 'aBarVal']],
-            ], ]]], get_object_values($obj));
-        self::assertSame(['aSubSubName' => ['aSubSubKey' => 'aBarVal']], get_object_values($subSubObj));
+            ], ]]], get_values($obj));
+        self::assertSame(['aSubSubName' => ['aSubSubKey' => 'aBarVal']], get_values($subSubObj));
     }
 
     public function testShouldNotChangesInSubObjReflectedInObjValuesIfUnset()
     {
-        $subObj = new SubObjectTest();
+        $subObj = new SubObject();
         $subObj->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $obj = new ObjectTest();
+        $obj = new Object();
         $obj->setObject('aName.aKey', $subObj);
 
-        self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]], get_object_values($obj));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_object_values($subObj));
+        self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]], get_values($obj));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObj));
 
         $obj->setObject('aName.aKey', null);
 
-        self::assertSame(['aName' => []], get_object_values($obj));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_object_values($subObj));
+        self::assertSame(['aName' => []], get_values($obj));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObj));
 
         $subObj->setValue('aSubName.aSubKey', 'aBarVal');
-        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_object_values($subObj));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_values($subObj));
     }
 
     /**
@@ -132,10 +132,10 @@ class ObjectsTraitTest extends TestCase
      */
     public function testShouldAddSubObjValuesToObjChangedValues()
     {
-        $subObj = new SubObjectTest();
+        $subObj = new SubObject();
         $subObj->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $obj = new ObjectTest();
+        $obj = new Object();
         $obj->setObject('aName.aKey', $subObj);
 
         self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]], get_object_changed_values($obj));
@@ -143,10 +143,10 @@ class ObjectsTraitTest extends TestCase
 
     public function testShouldUnsetSubObjIfSameValueChangedAfterSubObjSet()
     {
-        $subObj = new SubObjectTest();
+        $subObj = new SubObject();
         $subObj->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $obj = new ObjectTest();
+        $obj = new Object();
         $obj->setObject('aName.aKey', $subObj);
 
         self::assertAttributeSame(['aName' => ['aKey' => $subObj]], 'objects', $obj);
@@ -160,12 +160,12 @@ class ObjectsTraitTest extends TestCase
     {
         $subObjValues = ['aSubName' => ['aSubKey' => 'aFooVal']];
 
-        $expectedSubClass = $this->getMockClass(SubObjectTest::class);
+        $expectedSubClass = $this->getMockClass(SubObject::class);
 
-        $obj = new ObjectTest();
+        $obj = new Object();
 
         $values = ['aName' => ['aKey' => $subObjValues]];
-        set_object_values($obj, $values);
+        set_values($obj, $values);
 
         $subObj = $obj->getObject('aName.aKey', function ($actualSubObjValues) use ($subObjValues, $expectedSubClass) {
             self::assertSame($subObjValues, $actualSubObjValues);
@@ -178,16 +178,16 @@ class ObjectsTraitTest extends TestCase
 
     public function testShouldAllowGetPreviouslySetObjects()
     {
-        $subObjFoo = new SubObjectTest();
+        $subObjFoo = new SubObject();
         $subObjFoo->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $subObjBar = new SubObjectTest();
+        $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
-        $obj = new ObjectTest();
+        $obj = new Object();
         $obj->setObjects('aName.aKey', [$subObjFoo, $subObjBar]);
 
-        $objs = $obj->getObjects('aName.aKey', SubObjectTest::class);
+        $objs = $obj->getObjects('aName.aKey', SubObject::class);
         self::assertInstanceOf(\Traversable::class, $objs);
 
         self::assertSame([$subObjFoo, $subObjBar], iterator_to_array($objs));
@@ -195,9 +195,9 @@ class ObjectsTraitTest extends TestCase
         self::assertSame(['aName' => ['aKey' => [
             ['aSubName' => ['aSubKey' => 'aFooVal']],
             ['aSubName' => ['aSubKey' => 'aBarVal']],
-        ]]], get_object_values($obj));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_object_values($subObjFoo));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_object_values($subObjBar));
+        ]]], get_values($obj));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObjFoo));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_values($subObjBar));
     }
 
     public function testShouldCreateObjectsOnGet()
@@ -207,32 +207,35 @@ class ObjectsTraitTest extends TestCase
             ['aSubName' => ['aSubKey' => 'aBarVal']],
         ]]];
 
-        $obj = new ObjectTest();
-        set_object_values($obj, $values);
+        $obj = new Object();
+        set_values($obj, $values);
 
-        $subObjs = $obj->getObjects('aName.aKey', SubObjectTest::class);
+        $subObjs = $obj->getObjects('aName.aKey', SubObject::class);
         $subObjs = iterator_to_array($subObjs);
 
         self::assertCount(2, $subObjs);
-        self::assertContainsOnlyInstancesOf(SubObjectTest::class, $subObjs);
+        self::assertContainsOnlyInstancesOf(SubObject::class, $subObjs);
 
-        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_object_values($subObjs[0]));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_object_values($subObjs[1]));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObjs[0]));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_values($subObjs[1]));
     }
 
+    /**
+     * @group d
+     */
     public function testShouldAllowAddObjectToCollection()
     {
-        $subObjFoo = new SubObjectTest();
+        $subObjFoo = new SubObject();
         $subObjFoo->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $subObjBar = new SubObjectTest();
+        $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
-        $obj = new ObjectTest();
+        $obj = new Object();
         $obj->addObject('aName.aKey', $subObjFoo);
         $obj->addObject('aName.aKey', $subObjBar);
 
-        $objs = $obj->getObjects('aName.aKey', SubObjectTest::class);
+        $objs = $obj->getObjects('aName.aKey', SubObject::class);
         $objs = iterator_to_array($objs);
 
         self::assertSame([$subObjFoo, $subObjBar], $objs);
@@ -240,12 +243,12 @@ class ObjectsTraitTest extends TestCase
         self::assertSame(['aName' => ['aKey' => [
             ['aSubName' => ['aSubKey' => 'aFooVal']],
             ['aSubName' => ['aSubKey' => 'aBarVal']],
-        ]]], get_object_values($obj));
+        ]]], get_values($obj));
 
         self::assertAttributeSame(['aName' => ['aKey' => [$subObjFoo, $subObjBar]]], 'objects', $obj);
 
-        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_object_values($subObjFoo));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_object_values($subObjBar));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObjFoo));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_values($subObjBar));
     }
 
     public function testShouldAllowGetObjectsEitherSetAsValuesAndAddObject()
@@ -254,15 +257,15 @@ class ObjectsTraitTest extends TestCase
             ['aSubName' => ['aSubKey' => 'aFooVal']],
         ]]];
 
-        $obj = new ObjectTest();
-        set_object_values($obj, $values);
+        $obj = new Object();
+        set_values($obj, $values);
 
-        $subObjBar = new SubObjectTest();
+        $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
         $obj->addObject('aName.aKey', $subObjBar);
 
-        $subObjs = $obj->getObjects('aName.aKey', SubObjectTest::class);
+        $subObjs = $obj->getObjects('aName.aKey', SubObject::class);
         self::assertInstanceOf(\Traversable::class, $subObjs);
 
         $subObjs = iterator_to_array($subObjs);
@@ -272,21 +275,21 @@ class ObjectsTraitTest extends TestCase
         self::assertSame(['aName' => ['aKey' => [
             ['aSubName' => ['aSubKey' => 'aFooVal']],
             ['aSubName' => ['aSubKey' => 'aBarVal']],
-        ]]], get_object_values($obj));
+        ]]], get_values($obj));
 
-        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_object_values($subObjs[0]));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_object_values($subObjs[1]));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObjs[0]));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_values($subObjs[1]));
     }
 
     public function testShouldUpdateChangedValuesWhenObjectsSet()
     {
-        $subObjFoo = new SubObjectTest();
+        $subObjFoo = new SubObject();
         $subObjFoo->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $subObjBar = new SubObjectTest();
+        $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
-        $obj = new ObjectTest();
+        $obj = new Object();
 
         self::assertAttributeEmpty('changedValues', $obj);
 
@@ -300,20 +303,20 @@ class ObjectsTraitTest extends TestCase
 
     public function testShouldUpdatedChangedValuesWhenObjectAdded()
     {
-        $subObjFoo = new SubObjectTest();
+        $subObjFoo = new SubObject();
         $subObjFoo->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $subObjBar = new SubObjectTest();
+        $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
-        $obj = new ObjectTest();
+        $obj = new Object();
 
         self::assertAttributeEmpty('changedValues', $obj);
 
         $obj->addObject('aName.aKey', $subObjFoo);
         $obj->addObject('aName.aKey', $subObjBar);
 
-        $objs = $obj->getObjects('aName.aKey', SubObjectTest::class);
+        $objs = $obj->getObjects('aName.aKey', SubObject::class);
         $objs = iterator_to_array($objs);
 
         self::assertSame([$subObjFoo, $subObjBar], $objs);
@@ -326,65 +329,62 @@ class ObjectsTraitTest extends TestCase
 
     public function testShouldAllowUnsetObjects()
     {
-        $subObjFoo = new SubObjectTest();
+        $subObjFoo = new SubObject();
         $subObjFoo->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $subObjBar = new SubObjectTest();
+        $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
-        $obj = new ObjectTest();
+        $obj = new Object();
         $obj->setObjects('aName.aKey', [$subObjFoo, $subObjBar]);
 
         self::assertSame(['aName' => ['aKey' => [
             ['aSubName' => ['aSubKey' => 'aFooVal']],
             ['aSubName' => ['aSubKey' => 'aBarVal']],
-        ]]], get_object_values($obj));
+        ]]], get_values($obj));
 
         self::assertAttributeSame(['aName' => ['aKey' => [$subObjFoo, $subObjBar]]], 'objects', $obj);
 
-        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_object_values($subObjFoo));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_object_values($subObjBar));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObjFoo));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_values($subObjBar));
 
         $obj->setObjects('aName.aKey', null);
 
-        self::assertSame(['aName' => []], get_object_values($obj));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_object_values($subObjFoo));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_object_values($subObjBar));
+        self::assertSame(['aName' => []], get_values($obj));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObjFoo));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_values($subObjBar));
     }
 
     public function testShouldAllowResetObjects()
     {
-        $subObjFoo = new SubObjectTest();
+        $subObjFoo = new SubObject();
         $subObjFoo->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $subObjBar = new SubObjectTest();
+        $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
-        $obj = new ObjectTest();
+        $obj = new Object();
         $obj->setObjects('aName.aKey', [$subObjFoo, $subObjBar]);
 
         self::assertSame(['aName' => ['aKey' => [
             ['aSubName' => ['aSubKey' => 'aFooVal']],
             ['aSubName' => ['aSubKey' => 'aBarVal']],
-        ]]], get_object_values($obj));
+        ]]], get_values($obj));
 
         self::assertAttributeSame(['aName' => ['aKey' => [$subObjFoo, $subObjBar]]], 'objects', $obj);
 
-        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_object_values($subObjFoo));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_object_values($subObjBar));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObjFoo));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_values($subObjBar));
 
         $obj->setObjects('aName.aKey', []);
 
-        self::assertAttributeSame(['aName' => ['aKey' => []]], 'objects', $obj);
+        self::assertAttributeSame(['aName' => []], 'objects', $obj);
 
-        self::assertSame(['aName' => ['aKey' => []]], get_object_values($obj));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_object_values($subObjFoo));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_object_values($subObjBar));
+        self::assertSame(['aName' => ['aKey' => []]], get_values($obj));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObjFoo));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_values($subObjBar));
     }
 
-    /**
-     * @group d
-     */
     public function testShouldReflectChangesDoneInSubObject()
     {
         $values = [
@@ -395,13 +395,13 @@ class ObjectsTraitTest extends TestCase
             ],
         ];
 
-        $obj = new ObjectTest();
-        set_object_values($obj, $values);
+        $obj = new Object();
+        set_values($obj, $values);
 
         //guard
         self::assertEmpty(get_object_changed_values($obj));
 
-        $subObj = $obj->getObject('aName.aKey', SubObjectTest::class);
+        $subObj = $obj->getObject('aName.aKey', SubObject::class);
 
         $subObj->setValue('aSubName.aSubKey', 'aBarVal');
 
@@ -434,13 +434,13 @@ class ObjectsTraitTest extends TestCase
             ],
         ];
 
-        $obj = new ObjectTest();
-        set_object_values($obj, $values);
+        $obj = new Object();
+        set_values($obj, $values);
 
         //guard
         self::assertEmpty(get_object_changed_values($obj));
 
-        $subObjs = $obj->getObjects('aName.aKey', SubObjectTest::class);
+        $subObjs = $obj->getObjects('aName.aKey', SubObject::class);
 
         self::assertInstanceOf(\Traversable::class, $subObjs);
         $subObjs = iterator_to_array($subObjs);
@@ -470,8 +470,8 @@ class ObjectsTraitTest extends TestCase
             ],
         ];
 
-        $obj = new ObjectTest();
-        set_object_values($obj, $values);
+        $obj = new Object();
+        set_values($obj, $values);
 
         //guard
         self::assertEmpty(get_object_changed_values($obj));
@@ -493,17 +493,17 @@ class ObjectsTraitTest extends TestCase
             ],
         ];
 
-        $obj = new ObjectTest();
-        set_object_values($obj, $values);
+        $obj = new Object();
+        set_values($obj, $values);
 
         //guard
         self::assertEmpty(get_object_changed_values($obj));
 
-        /** @var SubObjectTest $subObj */
-        $subObj = $obj->getObject('aName.aKey', SubObjectTest::class);
+        /** @var SubObject $subObj */
+        $subObj = $obj->getObject('aName.aKey', SubObject::class);
 
         //guard
-        self::assertInstanceOf(SubObjectTest::class, $subObj);
+        self::assertInstanceOf(SubObject::class, $subObj);
 
         $clonedSubObj = clone_object($subObj);
         $clonedSubObj->setValue('self.aSubKeyFoo', 'aBarVal');
@@ -514,36 +514,36 @@ class ObjectsTraitTest extends TestCase
                     'aSubName' => ['aSubKey' => 'aFooVal'],
                 ],
             ],
-        ], get_object_values($obj));
+        ], get_values($obj));
     }
 
     public function testShouldAllowSetSelfObjectAndGetPreviouslySet()
     {
-        $subObjFoo = new SubObjectTest();
+        $subObjFoo = new SubObject();
         $subObjFoo->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $obj = new ObjectTest();
+        $obj = new Object();
         $obj->setObject('self.aKey', $subObjFoo);
 
-        self::assertSame($subObjFoo, $obj->getObject('self.aKey', ObjectTest::class));
+        self::assertSame($subObjFoo, $obj->getObject('self.aKey', Object::class));
         self::assertSame(['self' => ['aKey' =>
             ['aSubName' => ['aSubKey' => 'aFooVal']],
-        ]], get_object_values($obj));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_object_values($subObjFoo));
+        ]], get_values($obj));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObjFoo));
     }
 
     public function testShouldAllowSetSelfObjectsAndGetPreviouslySet()
     {
-        $subObjFoo = new SubObjectTest();
+        $subObjFoo = new SubObject();
         $subObjFoo->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $subObjBar = new SubObjectTest();
+        $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
-        $obj = new ObjectTest();
+        $obj = new Object();
         $obj->setObjects('self.aKey', [$subObjFoo, $subObjBar]);
 
-        $objs = $obj->getObjects('self.aKey', SubObjectTest::class);
+        $objs = $obj->getObjects('self.aKey', SubObject::class);
         $objs = iterator_to_array($objs);
 
         self::assertSame([$subObjFoo, $subObjBar], $objs);
@@ -551,24 +551,24 @@ class ObjectsTraitTest extends TestCase
         self::assertSame(['self' => ['aKey' => [
             ['aSubName' => ['aSubKey' => 'aFooVal']],
             ['aSubName' => ['aSubKey' => 'aBarVal']],
-        ]]], get_object_values($obj));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_object_values($subObjFoo));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_object_values($subObjBar));
+        ]]], get_values($obj));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObjFoo));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_values($subObjBar));
     }
 
     public function testShouldAllowAddSelfObjectsAndGetPreviouslySet()
     {
-        $subObjFoo = new SubObjectTest();
+        $subObjFoo = new SubObject();
         $subObjFoo->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $subObjBar = new SubObjectTest();
+        $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
-        $obj = new ObjectTest();
+        $obj = new Object();
         $obj->addObject('self.aKey', $subObjFoo);
         $obj->addObject('self.aKey', $subObjBar);
 
-        $objs = $obj->getObjects('self.aKey', SubObjectTest::class);
+        $objs = $obj->getObjects('self.aKey', SubObject::class);
         $objs = iterator_to_array($objs);
 
         self::assertSame([$subObjFoo, $subObjBar], $objs);
@@ -576,34 +576,8 @@ class ObjectsTraitTest extends TestCase
         self::assertSame(['self' => ['aKey' => [
             ['aSubName' => ['aSubKey' => 'aFooVal']],
             ['aSubName' => ['aSubKey' => 'aBarVal']],
-        ]]], get_object_values($obj));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_object_values($subObjFoo));
-        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_object_values($subObjBar));
-    }
-}
-
-class ObjectTest
-{
-    use ValuesTrait {
-        getValue as public;
-        setValue as public;
-        addValue as public;
-    }
-
-    use ObjectsTrait {
-        setObject as public;
-        getObject as public;
-        setObjects as public;
-        getObjects as public;
-        addObject as public;
-    }
-}
-
-class SubObjectTest
-{
-    use ValuesTrait {
-        getValue as public;
-        setValue as public;
-        addValue as public;
+        ]]], get_values($obj));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObjFoo));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_values($subObjBar));
     }
 }

@@ -17,6 +17,20 @@ trait ObjectsTrait
      */
     protected $objectBuilder;
 
+    protected function  registerObjectsHooks()
+    {
+        $resetObjectsHook = function($object, $key) {
+            array_unset($key, $this->objects);
+        };
+        $resetAllObjectsHook = function() {
+            $this->objects = [];
+        };
+
+        register_hook($this, 'post_set_value', $resetObjectsHook);
+        register_hook($this, 'post_add_value', $resetObjectsHook);
+        register_hook($this, 'post_set_values', $resetAllObjectsHook);
+    }
+
     /**
      * @param string $key
      * @param $classOrClosure
@@ -25,18 +39,7 @@ trait ObjectsTrait
      */
     protected function getObject($key, $classOrClosure)
     {
-        if (false == $object = get_value($key, null, $this->objects)) {
-            $values =& get_value($key, null, $this->values);
-            if (null === $values) {
-                return;
-            }
-
-            $object = build_object($classOrClosure, $values, $this->objectBuilder);
-
-            set_value($key, $object, $this->objects);
-        }
-
-        return $object;
+        return get_object($this, $key, $classOrClosure);
     }
 
     /**
@@ -45,17 +48,7 @@ trait ObjectsTrait
      */
     protected function setObject($key, $object)
     {
-        unset_value($key, $this->values, $this->changedValues);
-        unset_value($key, $this->objects);
-
-        if ($object) {
-            set_value($key, get_object_values($object), $this->values, $this->changedValues);
-
-            $values =& get_value($key, [], $this->values);
-            set_object_values($object, $values, true);
-
-            set_value($key, $object, $this->objects);
-        }
+        set_object($this, $key, $object);
     }
 
     /**
@@ -64,19 +57,7 @@ trait ObjectsTrait
      */
     protected function setObjects($key, $objects)
     {
-        if (null === $objects) {
-            unset_value($key, $this->values, $this->changedValues);
-            unset_value($key, $this->objects);
-        } else {
-            set_value($key, [], $this->values, $this->changedValues);
-            set_value($key, [], $this->objects);
-        }
-
-        if ($objects) {
-            foreach ($objects as $objectKey => $object) {
-                $this->addObject($key, $object, $objectKey);
-            }
-        }
+        set_objects($this, $key, $objects);
     }
 
     /**
@@ -86,19 +67,7 @@ trait ObjectsTrait
      */
     protected function addObject($key, $object, $objectKey = null)
     {
-        if (false == has_value($key, $this->values)) {
-            set_value($key, [], $this->values, $this->changedValues);
-        }
-
-        if (false == has_value($key, $this->objects)) {
-            set_value($key, [], $this->objects);
-        }
-
-        if (null === $objectKey) {
-            $objectKey = count(get_value($key, [], $this->values));
-        }
-
-        $this->setObject("$key.$objectKey", $object);
+        add_object($this, $key, $object, $objectKey);
     }
 
     /**
@@ -109,17 +78,7 @@ trait ObjectsTrait
      */
     protected function getObjects($key, $classOrClosure)
     {
-        foreach (array_keys(get_value($key, [], $this->values)) as $valueKey) {
-            if (false == $object = get_value("$key.$valueKey", null, $this->objects)) {
-                $values =& get_value("$key.$valueKey", [], $this->values);
-
-                $object = build_object($classOrClosure, $values, $this->objectBuilder);
-
-                set_value("$key.$valueKey", $object, $this->objects);
-            }
-
-            yield $object;
-        }
+        return get_objects($this, $key, $classOrClosure);
     }
 
     public function __clone()

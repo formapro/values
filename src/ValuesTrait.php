@@ -9,6 +9,11 @@ trait ValuesTrait
     protected $values = [];
 
     /**
+     * @var callable[]
+     */
+    protected $hooks = [];
+
+    /**
      * @var array
      */
     protected $changedValues = [];
@@ -19,18 +24,7 @@ trait ValuesTrait
      */
     protected function addValue($key, $value)
     {
-        if (method_exists($this, 'castValue')) {
-            $value = $this->castValue($value);
-        }
-
-        $currentValue = $this->getValue($key, []);
-        if (false == is_array($currentValue)) {
-            throw new \LogicException(sprintf('Cannot set value to %s it is already set and not array', $key));
-        }
-
-        $currentValue[] = $value;
-
-        $this->setValue($key, $currentValue);
+        add_value($this, $key, $value);
     }
 
     /**
@@ -39,15 +33,7 @@ trait ValuesTrait
      */
     protected function setValue($key, $value)
     {
-        if (method_exists($this, 'castValue')) {
-            $value = $this->castValue($value);
-        }
-
-        set_value($key, $value, $this->values, $this->changedValues);
-
-        if (property_exists($this, 'objects')) {
-            unset_value($key, $this->objects);
-        }
+        set_value($this, $key, $value);
     }
 
     /**
@@ -59,16 +45,6 @@ trait ValuesTrait
      */
     protected function getValue($key, $default = null, $castTo = null)
     {
-        $value = get_value($key, $default , $this->values);
-
-        if ($castTo) {
-            if (method_exists($this, 'cast')) {
-                $value = $this->cast($value, $castTo);
-            } else {
-                throw new \LogicException('Casting is not supported.');
-            }
-        }
-
-        return $value;
+        return get_value($this, $key, $default, $castTo);
     }
 }

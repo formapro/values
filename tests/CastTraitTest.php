@@ -1,17 +1,16 @@
 <?php
 namespace Makasim\Values\Tests;
 
-use Makasim\Values\CastTrait;
 use function Makasim\Values\get_object_changed_values;
-use function Makasim\Values\get_object_values;
-use Makasim\Values\ValuesTrait;
+use function Makasim\Values\get_values;
+use Makasim\Values\Tests\Model\CastableObject;
 use PHPUnit\Framework\TestCase;
 
 class CastTraitTest extends TestCase
 {
     public function testShouldAllowCastToTypeOnGet()
     {
-        $obj = new CastTest();
+        $obj = new CastableObject();
         $obj->setValue('aNamespace.aKey', '123');
 
         self::assertSame(123, $obj->getValue('aNamespace.aKey', null, 'int'));
@@ -22,7 +21,7 @@ class CastTraitTest extends TestCase
         $now = new \DateTime('now');
         $timestamp = $now->format('U');
 
-        $obj = new CastTest();
+        $obj = new CastableObject();
         $obj->setValue('aNamespace.aKey', $now);
 
         $actualDate = $obj->getValue('aNamespace.aKey', null, \DateTime::class);
@@ -37,7 +36,7 @@ class CastTraitTest extends TestCase
         $timestamp = $now->format('U');
         $iso = $now->format(DATE_ISO8601);
 
-        $obj = new CastTest();
+        $obj = new CastableObject();
         $obj->setValue('aNamespace.aKey', $now->format(DATE_ISO8601));
 
         self::assertSame($iso, $obj->getValue('aNamespace.aKey'));
@@ -52,7 +51,7 @@ class CastTraitTest extends TestCase
         $now = new \DateTime('now');
         $timestamp = $now->format('U');
 
-        $obj = new CastTest();
+        $obj = new CastableObject();
         $obj->setValue('aNamespace.aKey', $now->format('U'));
 
         self::assertSame($timestamp, $obj->getValue('aNamespace.aKey'));
@@ -68,11 +67,11 @@ class CastTraitTest extends TestCase
         $timestamp = (int) $now->format('U');
         $iso = $now->format(DATE_ISO8601);
 
-        $obj = new CastTest();
+        $obj = new CastableObject();
         $obj->addValue('aNamespace.aKey', $now);
 
         self::assertSame([['unix' => $timestamp, 'iso' => $iso]], $obj->getValue('aNamespace.aKey'));
-        self::assertSame(['aNamespace' => ['aKey' => [['unix' => $timestamp, 'iso' => $iso]]]], get_object_values($obj));
+        self::assertSame(['aNamespace' => ['aKey' => [['unix' => $timestamp, 'iso' => $iso]]]], get_values($obj));
         self::assertSame(['aNamespace' => ['aKey' => [['unix' => $timestamp, 'iso' => $iso]]]], get_object_changed_values($obj));
     }
 
@@ -80,7 +79,7 @@ class CastTraitTest extends TestCase
     {
         $interval = new \DateInterval('P7D');
 
-        $obj = new CastTest();
+        $obj = new CastableObject();
         $obj->addValue('aNamespace.aKey', $interval);
 
         self::assertSame([[
@@ -99,7 +98,7 @@ class CastTraitTest extends TestCase
     {
         $interval = new \DateInterval('P7D');
 
-        $obj = new CastTest();
+        $obj = new CastableObject();
         $obj->setValue('aNamespace.aKey', $interval);
 
         self::assertSame([
@@ -116,7 +115,7 @@ class CastTraitTest extends TestCase
 
     public function testShouldAllowSetDateTimeValueASStringAndGetPreviouslySet()
     {
-        $obj = new CastTest();
+        $obj = new CastableObject();
         $obj->setValue('aNamespace.aKey', 'P7D');
 
 
@@ -127,7 +126,7 @@ class CastTraitTest extends TestCase
 
     public function testShouldAllowSetDateTimeValueASArrayAndGetPreviouslySet()
     {
-        $obj = new CastTest();
+        $obj = new CastableObject();
         $obj->setValue('aNamespace.aKey', ['interval' => 'P7D']);
 
 
@@ -135,14 +134,4 @@ class CastTraitTest extends TestCase
         self::assertInstanceOf(\DateInterval::class, $interval);
         self::assertEquals('P0Y0M7DT00H00M00S', $interval->format('P%yY%mM%dDT%HH%IM%SS'));
     }
-}
-
-class CastTest
-{
-    use ValuesTrait {
-        getValue as public;
-        setValue as public;
-        addValue as public;
-    }
-    use CastTrait;
 }
