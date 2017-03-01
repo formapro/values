@@ -1,20 +1,20 @@
 {
   "name": "makasim/values",
   "type": "library",
-  "description": "Highly opinionated way of build Models",
-  "keywords": ["model", "mongo"],
+  "description": "An alter ego object. It is an object and an array at the same time",
+  "keywords": ["model"],
   "license": "MIT",
   "authors": [
     {
-      "name": "Kotlyar Maksim",
+      "name": "Maksym Kotliar",
       "email": "kotlyar.maksim@gmail.com"
     }
   ],
   "require": {
-    "php": ">=5.4.0"
+    "php": "^7"
   },
   "require-dev": {
-    "phpunit/phpunit": "~4.0"
+    "phpunit/phpunit": "^6"
   },
   "config": {
     "bin-dir": "bin"
@@ -23,12 +23,12 @@
     "psr-4": { "Makasim\\Values\\": "src" },
     "files": ["src/functions_include.php"]
   },
-  "autoload0-dev": {
-    "psr-4": { "Makasim\\Values\\Tests": "tests" }
+  "autoload-dev": {
+    "psr-4": { "Makasim\\Values\\Tests\\": "tests" }
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "0.1-dev"
+      "dev-master": "0.2-dev"
     }
   }
 }
