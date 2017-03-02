@@ -15,15 +15,15 @@ trait ObjectsTrait
     protected function  registerObjectsHooks()
     {
         $resetObjectsHook = function($object, $key) {
-            array_unset($key, $this->objects);
+            array_unset($key, $object->objects);
         };
-        $resetAllObjectsHook = function() {
-            $this->objects = [];
+        $resetAllObjectsHook = function($object) {
+            $object->objects = [];
         };
 
-        register_hook($this, 'post_set_value', $resetObjectsHook);
-        register_hook($this, 'post_add_value', $resetObjectsHook);
-        register_hook($this, 'post_set_values', $resetAllObjectsHook);
+        register_hook(get_class($this), 'post_set_value', $resetObjectsHook);
+        register_hook(get_class($this), 'post_add_value', $resetObjectsHook);
+        register_hook(get_class($this), 'post_set_values', $resetAllObjectsHook);
     }
 
     /**

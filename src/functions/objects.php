@@ -89,7 +89,7 @@ function get_object($object, $key, $classOrClosure)
                 return;
             }
 
-            $object = build_object($classOrClosure, $values, $this);
+            $object = build_object($classOrClosure, $values, $this, $key);
 
             array_set($key, $object, $this->objects);
         }
@@ -111,7 +111,7 @@ function get_objects($context, $key, $classOrClosure)
             if (false == $object = array_get("$key.$valueKey", null, $this->objects)) {
                 $values =& array_get("$key.$valueKey", [], $this->values);
 
-                $object = build_object($classOrClosure, $values, $this);
+                $object = build_object($classOrClosure, $values, $this, $key);
 
                 array_set("$key.$valueKey", $object, $this->objects);
             }
@@ -119,36 +119,4 @@ function get_objects($context, $key, $classOrClosure)
             yield $object;
         }
     })->call($context, $key, $classOrClosure);
-}
-
-/**
- * @param $classOrClosure
- * @param array $values
- * @param object|null $context
- *
- * @return object
- */
-function build_object($classOrClosure, array &$values, $context = null)
-{
-    if ($classOrClosure instanceof \Closure) {
-        $class = $classOrClosure($values);
-    } else {
-        $class = (string) $classOrClosure;
-    }
-
-    $object = new $class();
-    set_values($object, $values, true);
-
-    foreach (get_registered_hooks($object, 'post_build_object') as $callback) {
-        call_user_func($callback, $object, $context);
-    }
-
-    return $object;
-}
-
-function clone_object($object)
-{
-    $values = get_values($object);
-
-    return build_object(get_class($object), $values);
 }

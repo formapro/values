@@ -136,3 +136,36 @@ function get_object_changed_values($object)
         return $changedValues;
     })->call($object);
 }
+
+/**
+ * @param $classOrClosure
+ * @param array $values
+ * @param object|null $context
+ * @param string|null $contextKey
+ *
+ * @return object
+ */
+function build_object($classOrClosure, array &$values, $context = null, $contextKey = null)
+{
+    if ($classOrClosure instanceof \Closure) {
+        $class = $classOrClosure($values);
+    } else {
+        $class = (string) $classOrClosure;
+    }
+
+    $object = new $class();
+    set_values($object, $values, true);
+
+    foreach (get_registered_hooks($object, 'post_build_object') as $callback) {
+        call_user_func($callback, $object, $context, $contextKey);
+    }
+
+    return $object;
+}
+
+function clone_object($object)
+{
+    $values = get_values($object);
+
+    return build_object(get_class($object), $values);
+}

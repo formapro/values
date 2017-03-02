@@ -512,6 +512,7 @@ class HookStorageTest extends TestCase
 
             $actualObj = func_get_arg(0);
             self::assertNull(func_get_arg(1));
+            self::assertNull(func_get_arg(2));
         });
 
         $obj = build_object(Object::class, $values);
@@ -534,9 +535,10 @@ class HookStorageTest extends TestCase
 
             $actualObj = func_get_arg(0);
             self::assertSame($parentObj, func_get_arg(1));
+            self::assertSame('aParentKey', func_get_arg(2));
         });
 
-        $obj = build_object(Object::class, $values, $parentObj);
+        $obj = build_object(Object::class, $values, $parentObj, 'aParentKey');
 
         self::assertTrue($isCalled);
         self::assertSame($obj, $actualObj);
