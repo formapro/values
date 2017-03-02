@@ -1,158 +1,159 @@
 [![Build Status](https://travis-ci.org/makasim/values.png?branch=master)](https://travis-ci.org/makasim/values)
 
-# Values
+# Your "alter ego" objects
 
-**DEPRECATED**: Use [https://github.com/makasim/yadm](https://github.com/makasim/yadm).
+The approach tries to gather the best from array and object worlds. 
+So, with the library you can deal with object as you are used to but internally everything is stored into array.
+The array is easy to fetch out or set into of the object.
 
-This approach tries to gather the best from arrays and objects.
-You can store anything into an array, the array then could be easily converted to json, or saved in mongo.
-Objects can describe intention by their methods (getter or setters).
-When using arrays you have to always make sure keys are present in array (by doing isset), with objects you can rely on their methods.
+Could be used:
 
-Create a model class:
+* with [MongoDB](https://www.mongodb.com/) as lightweight (yet powerful) ODM.
+* with API by working with object but able to get arrays.
+* with message queues same as API.
+
+**An object** provide us with a contract which is easy to rely on. We can type hint a class, use auto complete on its methods.
+That's a good part, but it is not easy or cheap to populate objects with data or take their current state. 
+We have provide various tools like serializers, transformers and so on. Things are getting even worse when we have to deal with object trees.
+
+**An array** on the other hand is easy store or send. Whenever you call an api or do a query to database you end up working with an array. 
+That's a strong side but it does not gives any contract and code could be easily broken when array structure changes.
+
+## Examples
+
+### Get repository info example 
+
+Let's use [Github API](https://developer.github.com/v3/repos/#list-organization-repositories) and get info about [Symfony](https://github.com/symfony/symfony) repository. 
+Here's the [real response](https://api.github.com/repos/symfony/symfony), we will use a shortened version.
 
 ```php
 <?php
+namespace Acme;
 
-class Order
+use Makasim\Values\ValuesTrait;
+use Makasim\Values\ObjectsTrait;
+use function Makasim\Values\set_values;
+
+class Repo
 {
-    use \Makasim\Values\ValuesTrait;
+    use ValuesTrait;
+    use ObjectsTrait;
 
-    public function getNumber()
+    public function getStargazersCount()
     {
-        return $this->getValue('self', 'number');
+        return $this->getValue('stargazers_count');
     }
 
-    public function setNumber($number)
+    /** @return Owner */
+    public function getOwner()
     {
-        $this->setValue('self', 'number', $number);
-    }
-}
-```
-
-Create a new model:
-
-```php
-<?php
-
-// create new order
-$order = new Order;
-
-$order->setNumber('1234');
-$number = $order->getNumber();
-
-// get an order representation as an array. now you can store it (to mongo for example).
-$orderValues = \Makasim\Values\get_values($order);
-```
-
-Hydrate a model from an array:
-
-```php
-<?php
-
-$orderValues = [/* an array previously stored somewhere*/];
-
-// create new order
-$order = new Order;
-\Makasim\Values\set_values($order, $orderValues);
-
-$number = $order->getNumber();
-```
-
-Set custom values:
-
-```php
-<?php
-
-$order = new Order;
-
-$order->setValue('subscription', 'id', 123);
-$order->setValue('subscription', 'deliveryDate', '2015-10-10');
-$order->setValue('fortnox', 'invoiceNumber', 543);
-```
-
-# Objects
-
-Is a thin wrapper above values traits, which allows to build models tree, while still storing everything in the root.
-For example we have an order and price where the order is the root and price is a tree leaf.
-
-```php
-<?php
-
-class Order
-{
-    use \Makasim\Values\ValuesTrait;
-    use \Makasim\Values\ObjectsTrait;
-
-    public function getPrice()
-    {
-        return $this->getObject('self', 'price', Price::class);
-    }
-
-    public function setPrice(Price $price = null)
-    {
-        $this->setObject('self', 'price', $price);
+        return $this->getObject('owner', Owner::class);
     }
 }
 
-class Price
+class Owner
 {
-    use \Makasim\Values\ValuesTrait;
+    use ValuesTrait;
 
-    public function getAmount()
+    public function getId()
     {
-        return $this->getValue('self', 'amount', null, 'int');
+        return $this->getValue('id');
     }
 
-    public function setAmount($amount)
+    public function getLogin()
     {
-        $this->setValue('self', 'amount', $amount);
+        return $this->getValue('login');
     }
 }
+
+$data = json_decode('
+{
+  "id":458058,
+  "name":"symfony",
+  "full_name":"symfony/symfony",
+  "owner":{
+    "login":"symfony",
+    "id":143937,
+  },
+  "stargazers_count":13945,
+}
+', true);
+
+$repo = new Repo();
+set_values($repo, $data);
+
+$repo->getStargazersCount(); // 13945
+$repo->getOwner()->getLogin(); // symfony
 ```
 
-and usage example:
+### Create new gist
+
+Now, let's create a new gist. 
+According to [Github API](https://developer.github.com/v3/gists/#create-a-gist) we have to send an object with files collection.
+Lets create Gist and GistFile object. Populate them with data and get it as array.
 
 ```php
 <?php
+namespace  Acme;
 
-$price = new Price();
-$price->setAmount(100);
+use Makasim\Values\ObjectsTrait;
+use Makasim\Values\ValuesTrait;
 
-$order = new Order();
-$order->setPrice($price);
+class Gist
+{
+    use ValuesTrait;
+    use ObjectsTrait;
 
+    public function setDescription($description)
+    {
+        $this->setValue('description', $description);
+    }
 
-// it contains all order values INCLUDING leaf models, in our case price ones.
-$orderValues = \Makasim\Values\get_values($order);
+    public function setPublic($bool)
+    {
+        $this->setValue('public', $bool);
+    }
+
+    public function addFile($fileName, GistFile $file)
+    {
+        $this->addObject('files', $file, $fileName);
+    }
+}
+
+class GistFile
+{
+    use ValuesTrait;
+
+    public function __construct($content)
+    {
+        $this->setValue('content', $content);
+    }
+}
+
+$file = new GistFile('String file contents');
+
+$gist = new Gist();
+$gist->setDescription('the description for this gist');
+$gist->setPublic(true);
+$gist->addFile('file1.txt', $file);
+
+get_values($gist);
+
+/*
+[
+    'description' => 'the description for this gist',
+    'public' => true,
+    'files' => [
+        'file1.txt' => [
+            'content' => 'String file contents',
+        ]
+    ]
+]
+ */
+
+// now you can send it to api. 
 ```
 
-if you update values of leaf model they are update in order too:
+## License
 
-```php
-<?php
-
-$price = new Price();
-$price->setAmount(100);
-
-$order = new Order();
-$order->setPrice($price);
-
-$price->setAmount(200);
-
-// the values must contain price 200
-$orderValues = \Makasim\Values\get_values($order);
-```
-
-and you can easily hydrate your model from array:
-
-```php
-<?php
-
-$order = new Order();
-\Makasim\Values\set_values($order, $orderValues);
-
-$price = $order->getPrice();
-
-// if order values contains price, you will get a price instance
-```
+It is released under the [MIT License](LICENSE).
