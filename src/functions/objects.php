@@ -2,30 +2,6 @@
 namespace Makasim\Values;
 
 /**
- * @param string $key
- * @param $classOrClosure
- *
- * @return object|null
- */
-function get_object($object, $key, $classOrClosure)
-{
-    return (function($key, $classOrClosure) {
-        if (false == $object = array_get($key, null, $this->objects)) {
-            $values =& array_get($key, null, $this->values);
-            if (null === $values) {
-                return;
-            }
-
-            $object = build_object($classOrClosure, $values, $this->objectBuilder);
-
-            array_set($key, $object, $this->objects);
-        }
-
-        return $object;
-    })->call($object, $key, $classOrClosure);
-}
-
-/**
  * @param object      $context
  * @param string      $key
  * @param object|null $object
@@ -99,6 +75,30 @@ function add_object($context, $key, $object, $objectKey = null)
 }
 
 /**
+ * @param string $key
+ * @param $classOrClosure
+ *
+ * @return object|null
+ */
+function get_object($object, $key, $classOrClosure)
+{
+    return (function($key, $classOrClosure) {
+        if (false == $object = array_get($key, null, $this->objects)) {
+            $values =& array_get($key, null, $this->values);
+            if (null === $values) {
+                return;
+            }
+
+            $object = build_object($classOrClosure, $values, $this);
+
+            array_set($key, $object, $this->objects);
+        }
+
+        return $object;
+    })->call($object, $key, $classOrClosure);
+}
+
+/**
  * @param string          $key
  * @param string|\Closure $classOrClosure
  *
@@ -111,7 +111,7 @@ function get_objects($context, $key, $classOrClosure)
             if (false == $object = array_get("$key.$valueKey", null, $this->objects)) {
                 $values =& array_get("$key.$valueKey", [], $this->values);
 
-                $object = build_object($classOrClosure, $values, $this->objectBuilder);
+                $object = build_object($classOrClosure, $values, $this);
 
                 array_set("$key.$valueKey", $object, $this->objects);
             }
@@ -121,9 +121,14 @@ function get_objects($context, $key, $classOrClosure)
     })->call($context, $key, $classOrClosure);
 }
 
-// TODO tobe reviewed
-
-function build_object($classOrClosure, array &$values, \Closure $objectBuilder = null)
+/**
+ * @param $classOrClosure
+ * @param array $values
+ * @param object|null $context
+ *
+ * @return object
+ */
+function build_object($classOrClosure, array &$values, $context = null)
 {
     if ($classOrClosure instanceof \Closure) {
         $class = $classOrClosure($values);
@@ -134,7 +139,9 @@ function build_object($classOrClosure, array &$values, \Closure $objectBuilder =
     $object = new $class();
     set_values($object, $values, true);
 
-    $objectBuilder && $objectBuilder($object);
+    foreach (get_registered_hooks($object, 'post_build_object') as $callback) {
+        call_user_func($callback, $object, $context);
+    }
 
     return $object;
 }

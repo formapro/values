@@ -12,11 +12,6 @@ trait ObjectsTrait
      */
     protected $objects = [];
 
-    /**
-     * @var \Closure|null
-     */
-    protected $objectBuilder;
-
     protected function  registerObjectsHooks()
     {
         $resetObjectsHook = function($object, $key) {
@@ -79,12 +74,5 @@ trait ObjectsTrait
     protected function getObjects($key, $classOrClosure)
     {
         return get_objects($this, $key, $classOrClosure);
-    }
-
-    public function __clone()
-    {
-        if ($this->objectBuilder) {
-            $this->objectBuilder = \Closure::bind($this->objectBuilder, $this);
-        }
     }
 }

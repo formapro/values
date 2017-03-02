@@ -46,7 +46,7 @@ class ChangedValuesTraitTest extends TestCase
         $obj->setValue('aKey', 'aVal');
 
         self::assertChangedValuesSame(['aKey' => 'aVal'], $obj);
-        
+
         $values = ['bar' => 'barVal'];
         set_values($obj, $values);
         self::assertChangedValuesSame([], $obj);

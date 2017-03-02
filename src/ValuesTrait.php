@@ -11,7 +11,7 @@ trait ValuesTrait
     /**
      * @var callable[]
      */
-    protected $hooks = [];
+    protected $hookId = [];
 
     /**
      * @param string $key
