@@ -55,7 +55,11 @@ function add_value($object, $key, $value, $valueKey = null)
 
             $modified = array_set($key, $newValue, $this->values);
         } else {
-            $modified = array_set($key.'.'.$valueKey, $value, $this->values);
+            // workaround solution for a value key that contains dot.
+            $newValue = array_get($key, [], $this->values);
+            $newValue[$valueKey] = $value;
+
+            $modified = array_set($key, $newValue, $this->values);
         }
 
         foreach (get_registered_hooks($this, 'post_add_value') as $callback) {

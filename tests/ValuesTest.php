@@ -192,6 +192,16 @@ class ValuesTest extends TestCase
         self::assertSame(['aNamespace' => ['aKey' => ['aVal', 'aNewVal']]], get_values($obj));
     }
 
+    public function testShouldAllowAddValueWithCustomValueKeyThatContainsDot()
+    {
+        $obj = new Object();
+
+        add_value($obj, 'aKey', 'aVal', 'valueKey.withDot');
+
+        self::assertSame(['valueKey.withDot' => 'aVal'], get_value($obj, 'aKey'));
+        self::assertSame(['aKey' => ['valueKey.withDot' => 'aVal']], get_values($obj));
+    }
+
     /**
      * @expectedException \LogicException
      * @expectedExceptionMessage Cannot set value to aNamespace.aKey it is already set and not array
