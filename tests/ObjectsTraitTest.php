@@ -127,9 +127,6 @@ class ObjectsTraitTest extends TestCase
         self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_values($subObj));
     }
 
-    /**
-     *
-     */
     public function testShouldAddSubObjValuesToObjChangedValues()
     {
         $subObj = new SubObject();
@@ -579,5 +576,23 @@ class ObjectsTraitTest extends TestCase
         ]]], get_values($obj));
         self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObjFoo));
         self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_values($subObjBar));
+    }
+
+    public function testReplacePreviouslySetObjectAndUnreferenceIt()
+    {
+        $subObjFoo = new SubObject();
+        $subObjFoo->setValue('aSubKey', 'aFooVal');
+
+        $subObjBar = new SubObject();
+        $subObjBar->setValue('aSubKey', 'aBarVal');
+
+        $obj = new Object();
+        $obj->setObject('aKey', $subObjFoo);
+
+        $obj->setObject('aKey', $subObjBar);
+
+        self::assertSame(['aKey' => ['aSubKey' => 'aBarVal']], get_values($obj));
+        self::assertSame(['aSubKey' => 'aFooVal'], get_values($subObjFoo));
+        self::assertSame(['aSubKey' => 'aBarVal'], get_values($subObjBar));
     }
 }

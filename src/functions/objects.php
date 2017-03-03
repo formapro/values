@@ -10,6 +10,7 @@ function set_object($context, $key, $object)
 {
     (function($key, $object) {
         if ($object) {
+            set_value($this, $key, null);
             set_value($this, $key, get_values($object));
 
             $values =& array_get($key, [], $this->values);
