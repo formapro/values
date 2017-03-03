@@ -1,13 +1,17 @@
 <?php
 namespace Makasim\Values\Tests;
 
+use function Makasim\Values\add_object;
 use function Makasim\Values\add_value;
 use function Makasim\Values\build_object;
 use function Makasim\Values\get_value;
 use Makasim\Values\HookStorage;
+use function Makasim\Values\set_object;
+use function Makasim\Values\set_objects;
 use function Makasim\Values\set_value;
 use function Makasim\Values\set_values;
 use Makasim\Values\Tests\Model\Object;
+use Makasim\Values\Tests\Model\SubObject;
 use PHPUnit\Framework\TestCase;
 
 class HookStorageTest extends TestCase
@@ -511,8 +515,6 @@ class HookStorageTest extends TestCase
             $isCalled = true;
 
             $actualObj = func_get_arg(0);
-            self::assertNull(func_get_arg(1));
-            self::assertNull(func_get_arg(2));
         });
 
         $obj = build_object(Object::class, $values);
@@ -530,7 +532,7 @@ class HookStorageTest extends TestCase
         $isCalled = false;
         $actualObj = null;
 
-        HookStorage::register(Object::class, 'post_build_object', function() use ($parentObj, &$actualObj, &$isCalled) {
+        HookStorage::register(Object::class, 'post_build_sub_object', function() use ($parentObj, &$actualObj, &$isCalled) {
             $isCalled = true;
 
             $actualObj = func_get_arg(0);
@@ -542,5 +544,68 @@ class HookStorageTest extends TestCase
 
         self::assertTrue($isCalled);
         self::assertSame($obj, $actualObj);
+    }
+
+    public function testShouldCallPostSetObjectCallbackOnSetObject()
+    {
+        $obj = new Object();
+        $subObj = new SubObject();
+
+        $isCalled = false;
+        $actualObj = null;
+
+        HookStorage::register($obj, 'post_set_object', function() use ($subObj, $obj, &$isCalled) {
+            $isCalled = true;
+
+            self::assertSame($subObj, func_get_arg(0));
+            self::assertSame($obj, func_get_arg(1));
+            self::assertSame('aKey', func_get_arg(2));
+        });
+
+        set_object($obj, 'aKey', $subObj);
+
+        self::assertTrue($isCalled);
+    }
+
+    public function testShouldCallPostAddObjectCallbackOnAddObject()
+    {
+        $obj = new Object();
+        $subObj = new SubObject();
+
+        $isCalled = false;
+        $actualObj = null;
+
+        HookStorage::register($obj, 'post_add_object', function() use ($subObj, $obj, &$isCalled) {
+            $isCalled = true;
+
+            self::assertSame($subObj, func_get_arg(0));
+            self::assertSame($obj, func_get_arg(1));
+            self::assertSame('aKey.0', func_get_arg(2));
+        });
+
+        add_object($obj, 'aKey', $subObj);
+
+        self::assertTrue($isCalled);
+    }
+
+    public function testShouldCallPostSetObjectCallbackOnSetObjects()
+    {
+        $obj = new Object();
+        $subObj = new SubObject();
+
+        $isCalled = false;
+        $actualObj = null;
+
+        HookStorage::register($obj, 'post_set_object', function() use ($subObj, $obj, &$isCalled) {
+            $isCalled = true;
+
+            self::assertSame($subObj, func_get_arg(0));
+            self::assertSame($obj, func_get_arg(1));
+            self::assertSame('aKey.0', func_get_arg(2));
+        });
+
+        set_objects($obj, 'aKey', [$subObj]);
+
+        self::assertTrue($isCalled);
     }
 }

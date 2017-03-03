@@ -26,6 +26,5 @@ class Object
     public function __construct()
     {
         $this->registerChangedValuesHooks();
-        $this->registerObjectsHooks();
     }
 }

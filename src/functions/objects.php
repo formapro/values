@@ -8,8 +8,12 @@ namespace Makasim\Values;
  */
 function set_object($context, $key, $object)
 {
-    (function($key, $object) {
+    register_object_hooks($context);
+
+    (function($key, $object) use($context) {
         if ($object) {
+            register_object_hooks($object);
+
             set_value($this, $key, null);
             set_value($this, $key, get_values($object));
 
@@ -17,6 +21,10 @@ function set_object($context, $key, $object)
             set_values($object, $values, true);
 
             array_set($key, $object, $this->objects);
+
+            foreach (get_registered_hooks($context, 'post_set_object') as $callback) {
+                call_user_func($callback, $object, $context, $key);
+            }
         } else {
             set_value($this, $key, null);
             array_unset($key, $this->objects);
@@ -31,7 +39,9 @@ function set_object($context, $key, $object)
  */
 function set_objects($context, $key, $objects)
 {
-    (function($key, $objects) {
+    register_object_hooks($context);
+
+    (function($key, $objects) use ($context) {
         if (null !== $objects) {
             array_set($key, [], $this->objects);
 
@@ -43,10 +53,16 @@ function set_objects($context, $key, $objects)
             set_value($this, $key, $objectsValues);
 
             foreach ($objects as $objectKey => $object) {
+                register_object_hooks($object);
+
                 $values =& array_get($key.'.'.$objectKey, [], $this->values);
                 set_values($object, $values, true);
 
                 array_set($key.'.'.$objectKey, $object, $this->objects);
+
+                foreach (get_registered_hooks($context, 'post_set_object') as $callback) {
+                    call_user_func($callback, $object, $context, $key.'.'.$objectKey);
+                }
             }
         } else {
             set_value($this, $key, null);
@@ -62,7 +78,10 @@ function set_objects($context, $key, $objects)
  */
 function add_object($context, $key, $object, $objectKey = null)
 {
-    (function($key, $object, $objectKey) {
+    register_object_hooks($context);
+    register_object_hooks($object);
+
+    (function($key, $object, $objectKey) use ($context) {
         $objectValues = get_values($object);
 
         $objectKey = add_value($this, $key, $objectValues, $objectKey);
@@ -71,6 +90,10 @@ function add_object($context, $key, $object, $objectKey = null)
         set_values($object, $values, true);
 
         array_set($key.'.'.$objectKey, $object, $this->objects);
+
+        foreach (get_registered_hooks($context, 'post_add_object') as $callback) {
+            call_user_func($callback, $object, $context, $key.'.'.$objectKey);
+        }
 
     })->call($context, $key, $object, $objectKey);
 }
@@ -120,4 +143,66 @@ function get_objects($context, $key, $classOrClosure)
             yield $object;
         }
     })->call($context, $key, $classOrClosure);
+}
+
+function register_object_hooks($object)
+{
+    $resetObjectsHook = function($object, $key) {
+        call($object, $key, function($key) {
+            array_unset($key, $this->objects);
+        });
+    };
+
+    $class = get_class($object);
+    register_hook($class, 'post_set_value', $resetObjectsHook);
+    register_hook($class, 'post_add_value', $resetObjectsHook);
+
+    register_hook($class, 'post_set_values', function($object) {
+        call($object, function() {
+            $this->objects = [];
+        });
+    });
+
+    register_hook($class, 'post_build_object', function($object) {
+        register_object_hooks($object);
+    });
+
+    register_hook($class, 'post_build_sub_object', function($object) {
+        register_object_hooks($object);
+    });
+}
+
+function register_propagate_root_hooks($object)
+{
+    register_hook($object, 'post_set_object', function ($object, $context, $contextKey) {
+        propagate_root($object, $context, $contextKey);
+    });
+
+    register_hook($object, 'post_add_object', function ($object, $context, $contextKey) {
+        propagate_root($object, $context, $contextKey);
+    });
+
+    register_hook($object, 'post_build_sub_object', function ($object, $context, $contextKey) {
+        register_propagate_root_hooks($object);
+        propagate_root($object, $context, $contextKey);
+    });
+}
+
+function propagate_root($object, $parentObject, $parentKey)
+{
+    if (false == $parentObject) {
+        return;
+    }
+
+    list($rootObject, $rootObjectKey) = call($parentObject, $parentKey, function($parentKey) {
+       return [
+           isset($this->rootObject) ?: $this,
+           isset($this->rootObjectKey) ? $this->rootObjectKey.'.'.$parentKey : $parentKey
+       ];
+    });
+
+    call($object, $rootObject, $rootObjectKey, function($rootObject, $rootObjectKey) {
+        $this->rootObject = $rootObject;
+        $this->rootObjectKey = $rootObjectKey;
+    });
 }
