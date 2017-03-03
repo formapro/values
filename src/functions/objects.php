@@ -190,13 +190,11 @@ function register_propagate_root_hooks($object)
 
 function propagate_root($object, $parentObject, $parentKey)
 {
-//    var_dump(1);
     if (false == $parentObject) {
         return;
     }
-//    var_dump(2);
+
     list($rootObject, $rootObjectKey) = call($parentObject, $parentKey, function($parentKey) {
-//        var_dump(3);
        return [
            isset($this->rootObject) ?: $this,
            isset($this->rootObjectKey) ? $this->rootObjectKey.'.'.$parentKey : $parentKey
@@ -204,7 +202,6 @@ function propagate_root($object, $parentObject, $parentKey)
     });
 
     call($object, $rootObject, $rootObjectKey, function($rootObject, $rootObjectKey) {
-//        var_dump(4);
         $this->rootObject = $rootObject;
         $this->rootObjectKey = $rootObjectKey;
     });
