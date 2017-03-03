@@ -12,19 +12,9 @@ trait ObjectsTrait
      */
     protected $objects = [];
 
-    protected function  registerObjectsHooks()
-    {
-        $resetObjectsHook = function($object, $key) {
-            array_unset($key, $object->objects);
-        };
-        $resetAllObjectsHook = function($object) {
-            $object->objects = [];
-        };
+    protected $rootObject;
 
-        register_hook(get_class($this), 'post_set_value', $resetObjectsHook);
-        register_hook(get_class($this), 'post_add_value', $resetObjectsHook);
-        register_hook(get_class($this), 'post_set_values', $resetAllObjectsHook);
-    }
+    protected $rootObjectKey;
 
     /**
      * @param string $key

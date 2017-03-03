@@ -156,8 +156,14 @@ function build_object($classOrClosure, array &$values, $context = null, $context
     $object = new $class();
     set_values($object, $values, true);
 
-    foreach (get_registered_hooks($object, 'post_build_object') as $callback) {
-        call_user_func($callback, $object, $context, $contextKey);
+    if ($context) {
+        foreach (get_registered_hooks($context, 'post_build_sub_object') as $callback) {
+            call_user_func($callback, $object, $context, $contextKey);
+        }
+    } else {
+        foreach (get_registered_hooks($object, 'post_build_object') as $callback) {
+            call_user_func($callback, $object);
+        }
     }
 
     return $object;
@@ -168,4 +174,17 @@ function clone_object($object)
     $values = get_values($object);
 
     return build_object(get_class($object), $values);
+}
+
+function call()
+{
+    $args = func_get_args();
+
+    /** @var object $object */
+    $object = array_shift($args);
+
+    /** @var \Closure $closure */
+    $closure = array_pop($args);
+
+    return $closure->call($object, ...$args);
 }
