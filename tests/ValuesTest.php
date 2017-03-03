@@ -227,4 +227,15 @@ class ValuesTest extends TestCase
         self::assertSame('foo', get_value($obj, 'aNamespace.aKey'));
         self::assertSame('bar', get_value($clonedObj, 'aNamespace.aKey'));
     }
+
+    public function testShouldReplaceStringValueWithArray()
+    {
+        $obj = new Object();
+
+        set_value($obj, 'aKey', 'foo');
+        set_value($obj, 'aKey.aSubKey', 'bar');
+
+        self::assertSame(['aSubKey' => 'bar'], get_value($obj, 'aKey'));
+        self::assertSame(['aKey' => ['aSubKey' => 'bar']], get_values($obj));
+    }
 }

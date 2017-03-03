@@ -69,6 +69,10 @@ function array_path_set(array &$array, array $keys, $value, $force = false) {
         }
 
         $ref = &$ref[$parent];
+
+        if (!is_array($ref)) {
+            $ref = [];
+        }
     }
 
     $ref = $value;
