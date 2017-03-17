@@ -4,6 +4,7 @@ namespace Makasim\Values\Tests;
 use function Makasim\Values\add_object;
 use function Makasim\Values\add_value;
 use function Makasim\Values\build_object;
+use function Makasim\Values\get_object;
 use function Makasim\Values\get_value;
 use Makasim\Values\HookStorage;
 use function Makasim\Values\set_object;
@@ -605,6 +606,35 @@ class HookStorageTest extends TestCase
         });
 
         set_objects($obj, 'aKey', [$subObj]);
+
+        self::assertTrue($isCalled);
+    }
+
+    public function testShouldCallGetObjectClassOnGetObjectIfClassOrClosureArgumentNotProvided()
+    {
+        $values = [
+            'aKey' => [
+                'aSubKey' => 'aFooVal',
+            ],
+        ];
+
+        $obj = new Object();
+        set_values($obj, $values);
+
+        $isCalled = false;
+        $actualObj = null;
+
+        HookStorage::register($obj, 'get_object_class', function() use ($obj, &$isCalled) {
+            $isCalled = true;
+
+            self::assertSame($obj, func_get_arg(0));
+            self::assertSame('aKey', func_get_arg(1));
+            self::assertSame(['aSubKey' => 'aFooVal'], func_get_arg(2));
+
+            return SubObject::class;
+        });
+
+        get_object($obj, 'aKey');
 
         self::assertTrue($isCalled);
     }

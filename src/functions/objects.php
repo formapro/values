@@ -99,12 +99,13 @@ function add_object($context, $key, $object, $objectKey = null)
 }
 
 /**
+ * @param object $object
  * @param string $key
- * @param $classOrClosure
+ * @param string|\Closure|null $classOrClosure
  *
- * @return object|null
+ * @return null|object
  */
-function get_object($object, $key, $classOrClosure)
+function get_object($object, $key, $classOrClosure = null)
 {
     return (function($key, $classOrClosure) {
         if (false == $object = array_get($key, null, $this->objects)) {
@@ -112,6 +113,19 @@ function get_object($object, $key, $classOrClosure)
             if (null === $values) {
                 return;
             }
+
+            if (false == $classOrClosure) {
+                foreach (get_registered_hooks($this, 'get_object_class') as $callback) {
+                    if ($classOrClosure = call_user_func($callback, $this, $key, $values)) {
+                        break;
+                    }
+                }
+            }
+
+            if (false == $classOrClosure) {
+                throw new \LogicException('Either class or closure has to be passed explicitly or there must be a hook that provide an object class.');
+            }
+
 
             $object = build_object($classOrClosure, $values, $this, $key);
 
@@ -133,11 +147,11 @@ function get_objects($context, $key, $classOrClosure)
     return (function($key, $classOrClosure) {
         foreach (array_keys(array_get($key, [], $this->values)) as $valueKey) {
             if (false == $object = array_get("$key.$valueKey", null, $this->objects)) {
-                $values =& array_get("$key.$valueKey", [], $this->values);
-
-                $object = build_object($classOrClosure, $values, $this, $key);
-
-                array_set("$key.$valueKey", $object, $this->objects);
+                if ($object = get_object($this, "$key.$valueKey", $classOrClosure)) {
+                    array_set("$key.$valueKey", $object, $this->objects);
+                } else {
+                    throw new \LogicException(sprintf('The object on path "%s" could not be built. The path value is null.', "$key.$valueKey"));
+                }
             }
 
             yield $object;

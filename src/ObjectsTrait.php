@@ -12,17 +12,23 @@ trait ObjectsTrait
      */
     protected $objects = [];
 
+    /**
+     * @var object|null
+     */
     protected $rootObject;
 
+    /**
+     * @var string|null
+     */
     protected $rootObjectKey;
 
     /**
-     * @param string $key
-     * @param $classOrClosure
+     * @param string               $key
+     * @param string|\Closure|null $classOrClosure
      *
      * @return object|null
      */
-    protected function getObject($key, $classOrClosure)
+    protected function getObject($key, $classOrClosure = null)
     {
         return get_object($this, $key, $classOrClosure);
     }
@@ -56,12 +62,12 @@ trait ObjectsTrait
     }
 
     /**
-     * @param string          $key
-     * @param string|\Closure $classOrClosure
+     * @param string               $key
+     * @param string|\Closure|null $classOrClosure
      *
      * @return \Traversable
      */
-    protected function getObjects($key, $classOrClosure)
+    protected function getObjects($key, $classOrClosure = null)
     {
         return get_objects($this, $key, $classOrClosure);
     }

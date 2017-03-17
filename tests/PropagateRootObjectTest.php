@@ -74,14 +74,9 @@ class PropagateRootObjectTest extends TestCase
 
     public function testShouldSetRootObjectToEverySubObjectOnGetObjects()
     {
+        $values = ['aKey' => [[], []]];
         $obj = new Object();
 
-        $values = [
-            'aKey' => [
-                [],
-                [],
-            ]
-        ];
         set_values($obj, $values);
 
         register_propagate_root_hooks($obj);
@@ -94,10 +89,10 @@ class PropagateRootObjectTest extends TestCase
         self::assertCount(2, $subObjects);
 
         self::assertAttributeSame($obj, 'rootObject', $subObjects[0]);
-        self::assertAttributeSame('aKey', 'rootObjectKey', $subObjects[0]);
+        self::assertAttributeSame('aKey.0', 'rootObjectKey', $subObjects[0]);
 
         self::assertAttributeSame($obj, 'rootObject', $subObjects[1]);
-        self::assertAttributeSame('aKey', 'rootObjectKey', $subObjects[1]);
+        self::assertAttributeSame('aKey.1', 'rootObjectKey', $subObjects[1]);
     }
 
     public function testShouldSetRootObjectToSubObjectOnGetObject()

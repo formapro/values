@@ -2,8 +2,12 @@
 namespace Makasim\Values\Tests;
 
 use function Makasim\Values\clone_object;
+use function Makasim\Values\get_object;
+use function Makasim\Values\get_objects;
 use function Makasim\Values\get_values;
 use function Makasim\Values\get_object_changed_values;
+use Makasim\Values\HookStorage;
+use function Makasim\Values\register_hook;
 use function Makasim\Values\set_values;
 use Makasim\Values\Tests\Model\Object;
 use Makasim\Values\Tests\Model\SubObject;
@@ -11,6 +15,13 @@ use PHPUnit\Framework\TestCase;
 
 class ObjectsTraitTest extends TestCase
 {
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        HookStorage::clearAll();
+    }
+
     public function testShouldResetObjectIfValuesSetAgain()
     {
         $subObj = new SubObject();
@@ -217,9 +228,24 @@ class ObjectsTraitTest extends TestCase
         self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_values($subObjs[1]));
     }
 
-    /**
-     * @group d
-     */
+    public function testThrowIfNotArrayInCollection()
+    {
+        $values = ['aName' => ['aKey' => [
+            ['aSubName' => ['aSubKey' => 'aFooVal']],
+            null,
+            ['aSubName' => ['aSubKey' => 'aFooVal']],
+        ]]];
+
+        $obj = new Object();
+        set_values($obj, $values);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The object on path "aName.aKey.1" could not be built. The path value is null.');
+
+        $subObjs = get_objects($obj, 'aName.aKey', SubObject::class);
+        iterator_to_array($subObjs);
+    }
+
     public function testShouldAllowAddObjectToCollection()
     {
         $subObjFoo = new SubObject();
@@ -578,7 +604,7 @@ class ObjectsTraitTest extends TestCase
         self::assertSame(['aSubName' => ['aSubKey' => 'aBarVal']], get_values($subObjBar));
     }
 
-    public function testReplacePreviouslySetObjectAndUnreferenceIt()
+    public function testReplacePreviouslySetObjectAndUnReferenceIt()
     {
         $subObjFoo = new SubObject();
         $subObjFoo->setValue('aSubKey', 'aFooVal');
@@ -594,5 +620,41 @@ class ObjectsTraitTest extends TestCase
         self::assertSame(['aKey' => ['aSubKey' => 'aBarVal']], get_values($obj));
         self::assertSame(['aSubKey' => 'aFooVal'], get_values($subObjFoo));
         self::assertSame(['aSubKey' => 'aBarVal'], get_values($subObjBar));
+    }
+
+    public function testThrowIfGetObjectWithoutClassOrClosureAndHook()
+    {
+        $values = [
+            'aKey' => [
+                'aSubName' => ['aSubKey' => 'aFooVal'],
+            ],
+        ];
+
+        $obj = new Object();
+        set_values($obj, $values);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Either class or closure has to be passed explicitly or there must be a hook that provide an object class.');
+        get_object($obj, 'aKey');
+    }
+
+    public function testShouldBuildObjectFromClassProvidedByHook()
+    {
+        $values = [
+            'aKey' => [
+                'aSubName' => ['aSubKey' => 'aFooVal'],
+            ],
+        ];
+
+        $obj = new Object();
+        set_values($obj, $values);
+
+        register_hook($obj, 'get_object_class', function($object, $key, $values) {
+            return SubObject::class;
+        });
+
+        $subObj = get_object($obj, 'aKey');
+
+        $this->assertInstanceOf(SubObject::class, $subObj);
     }
 }
