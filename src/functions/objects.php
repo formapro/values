@@ -127,7 +127,7 @@ function get_object($object, $key, $classOrClosure = null)
             }
 
 
-            $object = build_object($classOrClosure, $values, $this, $key);
+            $object = build_object_ref($classOrClosure, $values, $this, $key);
 
             array_set($key, $object, $this->objects);
         }

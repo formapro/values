@@ -4,6 +4,7 @@ namespace Makasim\Values\Tests;
 use function Makasim\Values\add_object;
 use function Makasim\Values\add_value;
 use function Makasim\Values\build_object;
+use function Makasim\Values\build_object_ref;
 use function Makasim\Values\get_object;
 use function Makasim\Values\get_value;
 use Makasim\Values\HookStorage;
@@ -541,7 +542,7 @@ class HookStorageTest extends TestCase
             self::assertSame('aParentKey', func_get_arg(2));
         });
 
-        $obj = build_object(Object::class, $values, $parentObj, 'aParentKey');
+        $obj = build_object_ref(Object::class, $values, $parentObj, 'aParentKey');
 
         self::assertTrue($isCalled);
         self::assertSame($obj, $actualObj);

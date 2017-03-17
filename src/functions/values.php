@@ -138,14 +138,14 @@ function get_object_changed_values($object)
 }
 
 /**
- * @param $classOrClosure
+ * @param string|\Closure $classOrClosure
  * @param array $values
  * @param object|null $context
  * @param string|null $contextKey
  *
  * @return object
  */
-function build_object($classOrClosure, array &$values, $context = null, $contextKey = null)
+function build_object_ref($classOrClosure, array &$values, $context = null, $contextKey = null)
 {
     if ($classOrClosure instanceof \Closure) {
         $class = $classOrClosure($values);
@@ -169,11 +169,20 @@ function build_object($classOrClosure, array &$values, $context = null, $context
     return $object;
 }
 
+/**
+ * @param string|\Closure $classOrClosure
+ * @param array $values
+ *
+ * @return object
+ */
+function build_object($classOrClosure, array $values)
+{
+    return build_object_ref($classOrClosure, $values);
+}
+
 function clone_object($object)
 {
-    $values = get_values($object);
-
-    return build_object(get_class($object), $values);
+    return build_object(get_class($object), get_values($object));
 }
 
 function call()
