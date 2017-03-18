@@ -123,7 +123,11 @@ function get_object($object, $key, $classOrClosure = null)
             }
 
             if (false == $classOrClosure) {
-                throw new \LogicException('Either class or closure has to be passed explicitly or there must be a hook that provide an object class.');
+                throw new \LogicException(sprintf(
+                    'Cannot built object for %s::%s. Either class or closure has to be passed explicitly or there must be a hook that provide an object class.',
+                    get_class($this),
+                    $key
+                ));
             }
 
 
