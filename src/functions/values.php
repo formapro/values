@@ -154,6 +154,11 @@ function build_object_ref($classOrClosure, array &$values, $context = null, $con
     }
 
     $object = new $class();
+
+    //values set in constructor
+    $defaultValues = get_values($object);
+    $values = array_replace($defaultValues, $values);
+
     set_values($object, $values, true);
 
     if ($context) {

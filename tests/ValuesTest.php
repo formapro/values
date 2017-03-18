@@ -2,12 +2,14 @@
 namespace Makasim\Values\Tests;
 
 use function Makasim\Values\add_value;
+use function Makasim\Values\build_object;
 use function Makasim\Values\clone_object;
 use function Makasim\Values\get_value;
 use function Makasim\Values\get_values;
 use function Makasim\Values\set_value;
 use function Makasim\Values\set_values;
 use Makasim\Values\Tests\Model\Object;
+use Makasim\Values\ValuesTrait;
 use PHPUnit\Framework\TestCase;
 
 class ValuesTest extends TestCase
@@ -237,5 +239,30 @@ class ValuesTest extends TestCase
 
         self::assertSame(['aSubKey' => 'bar'], get_value($obj, 'aKey'));
         self::assertSame(['aKey' => ['aSubKey' => 'bar']], get_values($obj));
+    }
+
+    public function testShouldUseValuesSetInConstructorAsDefaultsOnBuildObject()
+    {
+        $obj = new class {
+            use ValuesTrait;
+
+            public function __construct()
+            {
+                $this->values = [
+                    'foo' => 'fooVal',
+                    'bar' => 'barVal',
+                ];
+            }
+        };
+
+        $builtObj = build_object(get_class($obj), [
+            'bar' => 'newBarVal'
+        ]);
+
+        $this->assertInstanceOf(get_class($obj), $builtObj);
+        $this->assertEquals([
+            'foo' => 'fooVal',
+            'bar' => 'newBarVal'
+        ], get_values($builtObj));
     }
 }
