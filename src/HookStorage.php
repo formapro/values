@@ -55,6 +55,10 @@ final class HookStorage
     public static function getHookId($object)
     {
         return (function() {
+            if (false == property_exists($this, 'hookId')) {
+                $this->hookId = null;
+            }
+
             if (false == $this->hookId) {
                 $this->hookId = get_class($this).':'.uniqid('', true);
             }
