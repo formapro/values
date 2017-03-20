@@ -649,7 +649,7 @@ class ObjectsTraitTest extends TestCase
         $obj = new Object();
         set_values($obj, $values);
 
-        register_hook($obj, 'get_object_class', function($object, $key, $values) {
+        register_hook('build_object', 'get_object_class', function($object, $key, $values) {
             return SubObject::class;
         });
 

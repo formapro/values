@@ -12,12 +12,22 @@ function register_hook($objectOrClass, $hook, \Closure $callback)
 }
 
 /**
- * @param object $object
+ * @param string        $hook
+ * @param \Closure      $callback
+ */
+function register_global_hook($hook, \Closure $callback)
+{
+    HookStorage::registerGlobal($hook, $callback);
+}
+
+/**
+ * @param object|string $objectOrClass
  * @param string $hook
  *
  * @return \Closure[]|\Traversable
  */
-function get_registered_hooks($object, $hook)
+function get_registered_hooks($objectOrClass, $hook)
 {
-    return HookStorage::get($object, $hook);
+    return HookStorage::get($objectOrClass, $hook);
 }
+

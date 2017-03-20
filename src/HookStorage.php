@@ -31,19 +31,42 @@ final class HookStorage
     }
 
     /**
-     * @param object $object
+     * @param string        $hook
+     * @param \Closure      $callback
+     */
+    public static function registerGlobal($hook, \Closure $callback)
+    {
+        static::register('_global', $hook, $callback);
+    }
+
+    /**
+     * @param object $objectOrClass
      * @param string $hook
      *
      * @return \Traversable|\Closure[]
      */
-    public static function get($object, $hook)
+    public static function get($objectOrClass, $hook)
     {
-        foreach (self::$hooks[$hook][self::getHookId($object)] ?? [] as $callback) {
-            yield $callback;
+        if (is_object($objectOrClass)) {
+            foreach (self::$hooks[$hook]['_global'] ?? [] as $callback) {
+                yield $callback;
+            }
+
+            foreach (self::$hooks[$hook][self::getHookId($objectOrClass)] ?? [] as $callback) {
+                yield $callback;
+            }
+
+            foreach (self::$hooks[$hook][get_class($objectOrClass)] ?? [] as $callback) {
+                yield $callback;
+            }
+
+            return;
         }
 
-        foreach (self::$hooks[$hook][get_class($object)] ?? [] as $callback) {
-            yield $callback;
+        if (is_string($objectOrClass)) {
+            foreach (self::$hooks[$hook][$objectOrClass] ?? [] as $callback) {
+                yield $callback;
+            }
         }
     }
 
@@ -54,17 +77,17 @@ final class HookStorage
      */
     public static function getHookId($object)
     {
-        return (function() {
-            if (false == property_exists($this, 'hookId')) {
-                $this->hookId = null;
+        return (function($object) {
+            if (false == property_exists($object, 'hookId')) {
+                $object->hookId = null;
             }
 
-            if (false == $this->hookId) {
-                $this->hookId = get_class($this).':'.uniqid('', true);
+            if (false == $object->hookId) {
+                $object->hookId = get_class($object).':'.uniqid('', true);
             }
 
-            return $this->hookId;
-        })->call($object);
+            return $object->hookId;
+        })->call($object, $object);
     }
 
     private function __construct()

@@ -2,6 +2,7 @@
 namespace Makasim\Values\Tests\Model;
 
 use Makasim\Values\CastTrait;
+use function Makasim\Values\register_cast_hooks;
 
 class CastableObject extends Object
 {
@@ -11,6 +12,6 @@ class CastableObject extends Object
     {
         parent::__construct();
 
-        $this->registerCastHooks();
+        register_cast_hooks($this);
     }
 }

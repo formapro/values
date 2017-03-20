@@ -114,23 +114,6 @@ function get_object($object, $key, $classOrClosure = null)
                 return;
             }
 
-            if (false == $classOrClosure) {
-                foreach (get_registered_hooks($this, 'get_object_class') as $callback) {
-                    if ($classOrClosure = call_user_func($callback, $this, $key, $values)) {
-                        break;
-                    }
-                }
-            }
-
-            if (false == $classOrClosure) {
-                throw new \LogicException(sprintf(
-                    'Cannot built object for %s::%s. Either class or closure has to be passed explicitly or there must be a hook that provide an object class.',
-                    get_class($this),
-                    $key
-                ));
-            }
-
-
             $object = build_object_ref($classOrClosure, $values, $this, $key);
 
             array_set($key, $object, $this->objects);
@@ -167,7 +150,9 @@ function register_object_hooks($object)
 {
     $resetObjectsHook = function($object, $key) {
         call($object, $key, function($key) {
-            array_unset($key, $this->objects);
+            if (property_exists($this, 'objects')) {
+                array_unset($key, $this->objects);
+            }
         });
     };
 

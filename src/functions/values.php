@@ -138,15 +138,35 @@ function get_object_changed_values($object)
 }
 
 /**
- * @param string|\Closure $classOrClosure
+ * @param string|\Closure|null $classOrClosure
  * @param array $values
  * @param object|null $context
  * @param string|null $contextKey
  *
  * @return object
  */
-function build_object_ref($classOrClosure, array &$values, $context = null, $contextKey = null)
+function build_object_ref($classOrClosure = null, array &$values, $context = null, $contextKey = null)
 {
+    if (false == $classOrClosure) {
+        foreach (get_registered_hooks('build_object', 'get_object_class') as $callback) {
+            if ($classOrClosure = call_user_func($callback, $values, $context, $contextKey)) {
+                break;
+            }
+        }
+    }
+
+    if (false == $classOrClosure) {
+        if ($context) {
+            throw new \LogicException(sprintf(
+                'Cannot built object for %s::%s. Either class or closure has to be passed explicitly or there must be a hook that provide an object class.',
+                get_class($context),
+                $contextKey
+            ));
+        } else {
+            throw new \LogicException('Cannot built object. Either class or closure has to be passed explicitly or there must be a hook that provide an object class.');
+        }
+    }
+
     if ($classOrClosure instanceof \Closure) {
         $class = $classOrClosure($values);
     } else {
@@ -175,12 +195,12 @@ function build_object_ref($classOrClosure, array &$values, $context = null, $con
 }
 
 /**
- * @param string|\Closure $classOrClosure
+ * @param string|\Closure|null $classOrClosure
  * @param array $values
  *
  * @return object
  */
-function build_object($classOrClosure, array $values)
+function build_object($classOrClosure = null, array $values)
 {
     return build_object_ref($classOrClosure, $values);
 }
@@ -188,6 +208,30 @@ function build_object($classOrClosure, array $values)
 function clone_object($object)
 {
     return build_object(get_class($object), get_values($object));
+}
+
+function register_cast_hooks($objectOrClass = null) {
+    $castValueHook = function($object, $key, $value) {
+        return (function($key, $value) {
+            return $this->castValue($value);
+        })->call($object, $key, $value);
+    };
+
+    $castToHook = function($object, $key, $value, $default, $castTo) {
+        return (function($key, $value, $default, $castTo) use ($value) {
+            return $castTo ? $this->cast($value, $castTo) : $value;
+        })->call($object, $key, $value, $default, $castTo);
+    };
+
+    if ($objectOrClass) {
+        register_hook($objectOrClass, 'pre_set_value', $castValueHook);
+        register_hook($objectOrClass, 'pre_add_value', $castValueHook);
+        register_hook($objectOrClass, 'post_get_value', $castToHook);
+    } else {
+        register_global_hook('pre_set_value', $castValueHook);
+        register_global_hook('pre_add_value', $castValueHook);
+        register_global_hook('post_get_value', $castToHook);
+    }
 }
 
 function call()

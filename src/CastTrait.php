@@ -3,21 +3,6 @@ namespace Makasim\Values;
 
 trait CastTrait
 {
-    protected function registerCastHooks()
-    {
-        $castValueHook = function($object, $key, $value) {
-            return $this->castValue($value);
-        };
-
-        $castToHook = function($object, $key, $value, $default, $castTo) {
-            return $castTo ? $this->cast($value, $castTo) : $value;
-        };
-
-        register_hook($this, 'pre_set_value', $castValueHook);
-        register_hook($this, 'pre_add_value', $castValueHook);
-        register_hook($this, 'post_get_value', $castToHook);
-    }
-
     /**
      * @param mixed $value
      * @param string $castTo

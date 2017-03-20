@@ -625,12 +625,12 @@ class HookStorageTest extends TestCase
         $isCalled = false;
         $actualObj = null;
 
-        HookStorage::register($obj, 'get_object_class', function() use ($obj, &$isCalled) {
+        HookStorage::register('build_object', 'get_object_class', function() use ($obj, &$isCalled) {
             $isCalled = true;
 
-            self::assertSame($obj, func_get_arg(0));
-            self::assertSame('aKey', func_get_arg(1));
-            self::assertSame(['aSubKey' => 'aFooVal'], func_get_arg(2));
+            self::assertSame(['aSubKey' => 'aFooVal'], func_get_arg(0));
+            self::assertSame($obj, func_get_arg(1));
+            self::assertSame('aKey', func_get_arg(2));
 
             return SubObject::class;
         });
