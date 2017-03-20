@@ -213,13 +213,17 @@ function clone_object($object)
 function register_cast_hooks($objectOrClass = null) {
     $castValueHook = function($object, $key, $value) {
         return (function($key, $value) {
-            return $this->castValue($value);
+            if (method_exists($this, 'castValue')) {
+                return $this->castValue($value);
+            }
         })->call($object, $key, $value);
     };
 
     $castToHook = function($object, $key, $value, $default, $castTo) {
         return (function($key, $value, $default, $castTo) use ($value) {
-            return $castTo ? $this->cast($value, $castTo) : $value;
+            if (method_exists($this, 'cast')) {
+                return $castTo ? $this->cast($value, $castTo) : $value;
+            }
         })->call($object, $key, $value, $default, $castTo);
     };
 

@@ -258,7 +258,24 @@ class HookStorageTest extends TestCase
 
         $hooks = HookStorage::get($obj, 'aHook');
         self::assertInstanceOf(\Generator::class, $hooks);
-        self::assertSame([$callback, $anotherCallback], iterator_to_array($hooks));
+        self::assertSame([$anotherCallback, $callback], iterator_to_array($hooks));
+    }
+
+    public function testShouldReturnRegisteredHooksIncludingGlobalOnes()
+    {
+        $obj = new Object();
+
+        HookStorage::clearAll();
+
+        $callback = function () {};
+        $anotherCallback = function () {};
+
+        HookStorage::register($obj, 'aHook', $callback);
+        HookStorage::registerGlobal('aHook', $anotherCallback);
+
+        $hooks = HookStorage::get($obj, 'aHook');
+        self::assertInstanceOf(\Generator::class, $hooks);
+        self::assertSame([$anotherCallback, $callback], iterator_to_array($hooks));
     }
 
     public function testShouldCallPostSetValuesCallbackOnPostSetValues()
