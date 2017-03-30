@@ -158,12 +158,16 @@ function build_object_ref($classOrClosure = null, array &$values, $context = nul
     if (false == $classOrClosure) {
         if ($context) {
             throw new \LogicException(sprintf(
-                'Cannot built object for %s::%s. Either class or closure has to be passed explicitly or there must be a hook that provide an object class.',
+                'Cannot built object for %s::%s. Either class or closure has to be passed explicitly or there must be a hook that provide an object class. Values: %s',
                 get_class($context),
-                $contextKey
+                $contextKey,
+                str_pad(var_export($values, true), 100)
             ));
         } else {
-            throw new \LogicException('Cannot built object. Either class or closure has to be passed explicitly or there must be a hook that provide an object class.');
+            throw new \LogicException(sprintf(
+                'Cannot built object. Either class or closure has to be passed explicitly or there must be a hook that provide an object class. Values: %s',
+                str_pad(var_export($values, true), 100)
+            ));
         }
     }
 

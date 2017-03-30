@@ -124,12 +124,12 @@ function get_object($object, $key, $classOrClosure = null)
 }
 
 /**
- * @param string          $key
- * @param string|\Closure $classOrClosure
+ * @param string               $key
+ * @param string|\Closure|null $classOrClosure
  *
  * @return \Traversable
  */
-function get_objects($context, $key, $classOrClosure)
+function get_objects($context, $key, $classOrClosure = null)
 {
     return (function($key, $classOrClosure) {
         foreach (array_keys(array_get($key, [], $this->values)) as $valueKey) {
