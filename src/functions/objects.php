@@ -8,12 +8,8 @@ namespace Makasim\Values;
  */
 function set_object($context, $key, $object)
 {
-    register_object_hooks($context);
-
     (function($key, $object) use($context) {
         if ($object) {
-            register_object_hooks($object);
-
             set_value($this, $key, null);
             set_value($this, $key, get_values($object));
 
@@ -39,8 +35,6 @@ function set_object($context, $key, $object)
  */
 function set_objects($context, $key, $objects)
 {
-    register_object_hooks($context);
-
     (function($key, $objects) use ($context) {
         if (null !== $objects) {
             array_set($key, [], $this->objects);
@@ -53,8 +47,6 @@ function set_objects($context, $key, $objects)
             set_value($this, $key, $objectsValues);
 
             foreach ($objects as $objectKey => $object) {
-                register_object_hooks($object);
-
                 $values =& array_get($key.'.'.$objectKey, [], $this->values);
                 set_values($object, $values, true);
 
@@ -78,9 +70,6 @@ function set_objects($context, $key, $objects)
  */
 function add_object($context, $key, $object, $objectKey = null)
 {
-    register_object_hooks($context);
-    register_object_hooks($object);
-
     (function($key, $object, $objectKey) use ($context) {
         $objectValues = get_values($object);
 
@@ -146,7 +135,7 @@ function get_objects($context, $key, $classOrClosure = null)
     })->call($context, $key, $classOrClosure);
 }
 
-function register_object_hooks($object)
+function register_object_hooks()
 {
     $resetObjectsHook = function($object, $key) {
         call($object, $key, function($key) {
@@ -156,22 +145,12 @@ function register_object_hooks($object)
         });
     };
 
-    $class = get_class($object);
-    register_hook($class, 'post_set_value', $resetObjectsHook);
-    register_hook($class, 'post_add_value', $resetObjectsHook);
-
-    register_hook($class, 'post_set_values', function($object) {
+    register_global_hook('post_set_value', $resetObjectsHook);
+    register_global_hook('post_add_value', $resetObjectsHook);
+    register_global_hook('post_set_values', function($object) {
         call($object, function() {
             $this->objects = [];
         });
-    });
-
-    register_hook($class, 'post_build_object', function($object) {
-        register_object_hooks($object);
-    });
-
-    register_hook($class, 'post_build_sub_object', function($object) {
-        register_object_hooks($object);
     });
 }
 

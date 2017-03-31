@@ -8,6 +8,7 @@ use function Makasim\Values\get_values;
 use function Makasim\Values\get_object_changed_values;
 use Makasim\Values\HookStorage;
 use function Makasim\Values\register_hook;
+use function Makasim\Values\register_object_hooks;
 use function Makasim\Values\set_values;
 use Makasim\Values\Tests\Model\Object;
 use Makasim\Values\Tests\Model\SubObject;
@@ -15,6 +16,15 @@ use PHPUnit\Framework\TestCase;
 
 class ObjectsTraitTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+
+        HookStorage::clearAll();
+
+        register_object_hooks();
+    }
+
     public function tearDown()
     {
         parent::tearDown();

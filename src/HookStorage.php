@@ -47,12 +47,11 @@ final class HookStorage
      */
     public static function get($objectOrClass, $hook)
     {
-        $class = is_object($objectOrClass) ? get_class($objectOrClass) : (string) $objectOrClass;
-
         foreach (self::$hooks[$hook]['_global'] ?? [] as $callback) {
             yield $callback;
         }
 
+        $class = is_object($objectOrClass) ? get_class($objectOrClass) : (string) $objectOrClass;
         foreach (self::$hooks[$hook][$class] ?? [] as $callback) {
             yield $callback;
         }
