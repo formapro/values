@@ -130,7 +130,7 @@ function get_objects($context, $key, $classOrClosure = null)
                 }
             }
 
-            yield $object;
+            yield $valueKey => $object;
         }
     })->call($context, $key, $classOrClosure);
 }
