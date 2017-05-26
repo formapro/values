@@ -224,7 +224,7 @@ function register_cast_hooks($objectOrClass = null) {
     };
 
     $castToHook = function($object, $key, $value, $default, $castTo) {
-        return (function($key, $value, $default, $castTo) use ($value) {
+        return (function($key, $value, $default, $castTo) {
             if (method_exists($this, 'cast')) {
                 return $castTo ? $this->cast($value, $castTo) : $value;
             }
