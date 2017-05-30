@@ -30,6 +30,44 @@ class CastTraitTest extends TestCase
         self::assertEquals($timestamp, $actualDate->format('U'));
     }
 
+    public function testShouldNotCastValueToDateTimeIfValueIsNotSetOrNull()
+    {
+        $obj = new CastableObject();
+
+        // is not set
+        self::assertNull($obj->getValue('aNamespace.aKey', null, \DateTime::class));
+
+        // set null
+        $obj->setValue('aNamespace.aKey', null);
+        self::assertNull($obj->getValue('aNamespace.aKey', null, \DateTime::class));
+    }
+
+    public function testShouldNotCastValueToDateIntervalIfValueIsNotSetOrNull()
+    {
+        $obj = new CastableObject();
+
+        // is not set
+        self::assertNull($obj->getValue('aNamespace.aKey', null, \DateInterval::class));
+
+        // set null
+        $obj->setValue('aNamespace.aKey', null);
+        self::assertNull($obj->getValue('aNamespace.aKey', null, \DateInterval::class));
+    }
+
+    public function testShouldCastScalarValueEvenIfValueIsNotSetOrNull()
+    {
+        $obj = new CastableObject();
+
+        // is not set
+        self::assertInternalType('integer', $obj->getValue('aNamespace.aKey', null, 'integer'));
+        self::assertSame(0, $obj->getValue('aNamespace.aKey', null, 'integer'));
+
+        // set null
+        $obj->setValue('aNamespace.aKey', null);
+        self::assertInternalType('integer', $obj->getValue('aNamespace.aKey', null, 'integer'));
+        self::assertSame(0, $obj->getValue('aNamespace.aKey', null, 'integer'));
+    }
+
     public function testShouldAllowSetDateTimeValueASISOAndGetPreviouslySet()
     {
         $now = new \DateTime('now');
