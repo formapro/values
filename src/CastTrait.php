@@ -12,7 +12,9 @@ trait CastTrait
     protected function cast($value, $castTo)
     {
         if (\DateTime::class == $castTo) {
-            if (is_numeric($value)) {
+            if (null === $value) {
+                return null;
+            } elseif (is_numeric($value)) {
                 $value = \DateTime::createFromFormat('U', $value);
             } elseif (is_array($value)) {
                 $value = \DateTime::createFromFormat('U', $value['unix']);
@@ -20,7 +22,9 @@ trait CastTrait
                 $value = new \DateTime($value);
             }
         } else if (\DateInterval::class == $castTo) {
-            if (is_array($value)) {
+            if (null === $value) {
+                return null;
+            } elseif (is_array($value)) {
                 $value = new \DateInterval($value['interval']);
             } else {
                 $value = new \DateInterval($value);
