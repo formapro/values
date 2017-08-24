@@ -15,7 +15,7 @@ trait ValuesTrait
 
     /**
      * @param string $key
-     * @param string $value
+     * @param string|int|null|array $value
      */
     protected function addValue($key, $value)
     {
@@ -24,7 +24,7 @@ trait ValuesTrait
 
     /**
      * @param string $key
-     * @param string $value
+     * @param string|int|null|array $value
      */
     protected function setValue($key, $value)
     {
@@ -34,7 +34,7 @@ trait ValuesTrait
     /**
      * @param string $key
      * @param mixed  $default
-     * @param string $castTo
+     * @param string|int|null|array $castTo
      *
      * @return mixed
      */
