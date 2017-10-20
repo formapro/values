@@ -11,6 +11,7 @@ use function Makasim\Values\register_hook;
 use function Makasim\Values\register_object_hooks;
 use function Makasim\Values\set_values;
 use Makasim\Values\Tests\Model\Object;
+use Makasim\Values\Tests\Model\OtherSubObject;
 use Makasim\Values\Tests\Model\SubObject;
 use PHPUnit\Framework\TestCase;
 
@@ -666,5 +667,28 @@ class ObjectsTraitTest extends TestCase
         $subObj = get_object($obj, 'aKey');
 
         $this->assertInstanceOf(SubObject::class, $subObj);
+    }
+
+    public function testClassProvidedByHookShouldTakePriorityOverClassAsArgument()
+    {
+        $values = [
+            'aKey' => [
+                'aSubName' => ['aSubKey' => 'aFooVal'],
+            ],
+        ];
+
+        $argumentClass = SubObject::class;
+        $hookClass = OtherSubObject::class;
+
+        $obj = new Object();
+        set_values($obj, $values);
+
+        register_hook('build_object', 'get_object_class', function($object, $key, $values) use ($hookClass) {
+            return $hookClass;
+        });
+
+        $subObj = get_object($obj, 'aKey', $argumentClass);
+
+        $this->assertInstanceOf($hookClass, $subObj);
     }
 }
