@@ -147,11 +147,9 @@ function get_object_changed_values($object)
  */
 function build_object_ref($classOrClosure = null, array &$values, $context = null, $contextKey = null)
 {
-    if (false == $classOrClosure) {
-        foreach (get_registered_hooks('build_object', 'get_object_class') as $callback) {
-            if ($classOrClosure = call_user_func($callback, $values, $context, $contextKey)) {
-                break;
-            }
+    foreach (get_registered_hooks('build_object', 'get_object_class') as $callback) {
+        if ($dynamicClassOrClosure = call_user_func($callback, $values, $context, $contextKey)) {
+            $classOrClosure = $dynamicClassOrClosure;
         }
     }
 
