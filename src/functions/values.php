@@ -138,22 +138,22 @@ function get_object_changed_values($object)
 }
 
 /**
- * @param string|\Closure|null $classOrClosure
+ * @param string|callable|null $classOrCallable
  * @param array $values
  * @param object|null $context
  * @param string|null $contextKey
  *
  * @return object
  */
-function build_object_ref($classOrClosure = null, array &$values, $context = null, $contextKey = null)
+function build_object_ref($classOrCallable = null, array &$values, $context = null, $contextKey = null)
 {
     foreach (get_registered_hooks('build_object', 'get_object_class') as $callback) {
-        if ($dynamicClassOrClosure = call_user_func($callback, $values, $context, $contextKey)) {
-            $classOrClosure = $dynamicClassOrClosure;
+        if ($dynamicClassOrCallable = call_user_func($callback, $values, $context, $contextKey)) {
+            $classOrCallable = $dynamicClassOrCallable;
         }
     }
 
-    if (false == $classOrClosure) {
+    if (false == $classOrCallable) {
         if ($context) {
             throw new \LogicException(sprintf(
                 'Cannot built object for %s::%s. Either class or closure has to be passed explicitly or there must be a hook that provide an object class. Values: %s',
@@ -169,10 +169,10 @@ function build_object_ref($classOrClosure = null, array &$values, $context = nul
         }
     }
 
-    if ($classOrClosure instanceof \Closure) {
-        $class = $classOrClosure($values);
+    if (is_callable($classOrCallable)) {
+        $class = $classOrCallable($values);
     } else {
-        $class = (string) $classOrClosure;
+        $class = (string) $classOrCallable;
     }
 
     $object = new $class();
@@ -197,14 +197,14 @@ function build_object_ref($classOrClosure = null, array &$values, $context = nul
 }
 
 /**
- * @param string|\Closure|null $classOrClosure
+ * @param string|callable|null $classOrCallable
  * @param array $values
  *
  * @return object
  */
-function build_object($classOrClosure = null, array $values)
+function build_object($classOrCallable = null, array $values)
 {
-    return build_object_ref($classOrClosure, $values);
+    return build_object_ref($classOrCallable, $values);
 }
 
 function clone_object($object)
