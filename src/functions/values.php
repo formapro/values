@@ -8,7 +8,7 @@ namespace Makasim\Values;
  *
  * @return object
  */
-function set_values($object, array &$values, $byReference = false)
+function set_values($object, array &$values, bool $byReference = false)
 {
     $func = (function (array &$values, $byReference) {
         if ($byReference) {
@@ -27,9 +27,11 @@ function set_values($object, array &$values, $byReference = false)
     return $func($values, $byReference);
 }
 
-function get_values($object)
+function get_values($object, bool $copy = true): array
 {
-    return (function () { return $this->values; })->call($object);
+    $values = (function () { return $this->values; })->call($object);
+
+    return $copy ? array_copy($values) : $values;
 }
 
 function add_value($object, $key, $value, $valueKey = null)
@@ -178,7 +180,7 @@ function build_object_ref($classOrCallable = null, array &$values, $context = nu
     $object = new $class();
 
     //values set in constructor
-    $defaultValues = get_values($object);
+    $defaultValues = get_values($object, false);
     $values = array_replace($defaultValues, $values);
 
     set_values($object, $values, true);
@@ -209,7 +211,7 @@ function build_object($classOrCallable = null, array $values)
 
 function clone_object($object)
 {
-    return build_object(get_class($object), get_values($object));
+    return build_object(get_class($object), get_values($object, true));
 }
 
 function register_cast_hooks($objectOrClass = null) {
