@@ -691,4 +691,23 @@ class ObjectsTraitTest extends TestCase
 
         $this->assertInstanceOf($hookClass, $subObj);
     }
+
+    public function testShouldNotChangeObjectValuesIfGetValuesCopiedTrue()
+    {
+        $subObj = new SubObject();
+        $subObj->setValue('aSubName.aSubKey', 'aFooVal');
+
+        $obj = new Object();
+        $obj->setObject('aName.aKey', $subObj);
+
+        $values = get_values($obj); // copy must be true by default
+
+        self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]], get_values($obj));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObj));
+
+        $values['aName']['aKey']['aSubName']['aSubKey'] = 'aBarVal';
+
+        self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]], get_values($obj));
+        self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObj));
+    }
 }

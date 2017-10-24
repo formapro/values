@@ -112,3 +112,26 @@ function array_path_unset(array &$array, array $parents, &$keyExisted = null) {
         $keyExisted = FALSE;
     }
 }
+
+function array_copy(array $array)
+{
+    // values array may contain sub array passed as a reference to a sub object.
+    // this code removes such refs from the array.
+    // Here's "foreach rec optimized" version which showed the best result
+    // performance results (1000 cycles):
+    //   get_values              - 0.001758
+    //   foreach rec optimized   - 0.008587
+    //   foreach recursion       - 0.015547
+    //   serialize\unserialze    - 0.020816
+    //   json encode\decode      - 0.078953
+    $copiedArray = [];
+    foreach($array as $key => $value) {
+        if(is_array($value)) {
+            $value = array_copy($value);
+        }
+
+        $copiedArray[$key] = $value;
+    }
+
+    return $copiedArray;
+}

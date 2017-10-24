@@ -11,7 +11,7 @@ function set_object($context, $key, $object)
     (function($key, $object) use($context) {
         if ($object) {
             set_value($this, $key, null);
-            set_value($this, $key, get_values($object));
+            set_value($this, $key, get_values($object, false));
 
             $values =& array_get($key, [], $this->values);
             set_values($object, $values, true);
@@ -41,7 +41,7 @@ function set_objects($context, $key, $objects)
 
             $objectsValues = [];
             foreach ($objects as $objectKey => $object) {
-                array_set($objectKey, get_values($object), $objectsValues);
+                array_set($objectKey, get_values($object, false), $objectsValues);
             }
 
             set_value($this, $key, $objectsValues);
@@ -71,7 +71,7 @@ function set_objects($context, $key, $objects)
 function add_object($context, $key, $object, $objectKey = null)
 {
     (function($key, $object, $objectKey) use ($context) {
-        $objectValues = get_values($object);
+        $objectValues = get_values($object, false);
 
         $objectKey = add_value($this, $key, $objectValues, $objectKey);
 
