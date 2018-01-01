@@ -5,7 +5,7 @@ use Makasim\Values\ChangedValuesTrait;
 use Makasim\Values\ObjectsTrait;
 use Makasim\Values\ValuesTrait;
 
-class Object
+class EmptyObject
 {
     use ValuesTrait {
         getValue as public;

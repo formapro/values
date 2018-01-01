@@ -1,6 +1,6 @@
 <?php
 namespace Makasim\Values\Tests\Model;
 
-class OtherSubObject extends Object
+class OtherSubObject extends EmptyObject
 {
 }
