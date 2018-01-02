@@ -12,7 +12,7 @@ use function Makasim\Values\set_object;
 use function Makasim\Values\set_objects;
 use function Makasim\Values\set_value;
 use function Makasim\Values\set_values;
-use Makasim\Values\Tests\Model\Object;
+use Makasim\Values\Tests\Model\EmptyObject;
 use Makasim\Values\Tests\Model\SubObject;
 use PHPUnit\Framework\TestCase;
 
@@ -34,7 +34,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldRegisterHookForObject()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -56,7 +56,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldRegisterSeveralHooksForObject()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -81,7 +81,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldRegisterSeveralHooksForDifferentFunctionsToObject()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -110,8 +110,8 @@ class HookStorageTest extends TestCase
 
     public function testShouldRegisterSeveralHooksToSeveralObjects()
     {
-        $fooObj = new Object();
-        $barObj = new Object();
+        $fooObj = new EmptyObject();
+        $barObj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -145,11 +145,11 @@ class HookStorageTest extends TestCase
     {
         $callback = function () {};
 
-        HookStorage::register(Object::class, 'aHook', $callback);
+        HookStorage::register(EmptyObject::class, 'aHook', $callback);
 
         self::assertSame([
             'aHook' => [
-                Object::class => [
+                EmptyObject::class => [
                     spl_object_hash($callback) => $callback
                 ]
             ]
@@ -161,12 +161,12 @@ class HookStorageTest extends TestCase
         $callback = function () {};
         $anotherCallback = function () {};
 
-        HookStorage::register(Object::class, 'aHook', $callback);
-        HookStorage::register(Object::class, 'aHook', $anotherCallback);
+        HookStorage::register(EmptyObject::class, 'aHook', $callback);
+        HookStorage::register(EmptyObject::class, 'aHook', $anotherCallback);
 
         self::assertSame([
             'aHook' => [
-                Object::class => [
+                EmptyObject::class => [
                     spl_object_hash($callback) => $callback,
                     spl_object_hash($anotherCallback) => $anotherCallback,
                 ]
@@ -179,17 +179,17 @@ class HookStorageTest extends TestCase
         $callback = function () {};
         $anotherCallback = function () {};
 
-        HookStorage::register(Object::class, 'aFooHook', $callback);
-        HookStorage::register(Object::class, 'aBarHook', $anotherCallback);
+        HookStorage::register(EmptyObject::class, 'aFooHook', $callback);
+        HookStorage::register(EmptyObject::class, 'aBarHook', $anotherCallback);
 
         self::assertSame([
             'aFooHook' => [
-                Object::class => [
+                EmptyObject::class => [
                     spl_object_hash($callback) => $callback,
                 ],
             ],
             'aBarHook' => [
-                Object::class => [
+                EmptyObject::class => [
                     spl_object_hash($anotherCallback) => $anotherCallback,
                 ],
             ]
@@ -201,12 +201,12 @@ class HookStorageTest extends TestCase
         $callback = function () {};
         $anotherCallback = function () {};
 
-        HookStorage::register(Object::class, 'aHook', $callback);
+        HookStorage::register(EmptyObject::class, 'aHook', $callback);
         HookStorage::register(\stdClass::class, 'aHook', $anotherCallback);
 
         self::assertSame([
             'aHook' => [
-                Object::class => [
+                EmptyObject::class => [
                     spl_object_hash($callback) => $callback,
                 ],
                 \stdClass::class => [
@@ -218,7 +218,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldReturnEmptyArrayIfNoCallbacksRegisteredForSuchObjectAndHook()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -229,7 +229,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldReturnRegisteredHooks()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -246,7 +246,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldReturnRegisteredHooksIncludingOnesForClass()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -254,7 +254,7 @@ class HookStorageTest extends TestCase
         $anotherCallback = function () {};
 
         HookStorage::register($obj, 'aHook', $callback);
-        HookStorage::register(Object::class, 'aHook', $anotherCallback);
+        HookStorage::register(EmptyObject::class, 'aHook', $anotherCallback);
 
         $hooks = HookStorage::get($obj, 'aHook');
         self::assertInstanceOf(\Generator::class, $hooks);
@@ -263,7 +263,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldReturnRegisteredHooksIncludingGlobalOnes()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -280,7 +280,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldCallPostSetValuesCallbackOnPostSetValues()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -301,7 +301,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldCallPostSetValueCallbackOnSetValuesAndPassByReferenceArgument()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -320,7 +320,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldCallPreAddValueCallbackOnAddValue()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -344,7 +344,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldAllowModifyValueInPreAddValueCallback()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -366,7 +366,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldCallPostAddValueCallbackOnAddValue()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -389,7 +389,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldCallPostAddValueCallbackOnAddValueWithCustomValueKey()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -410,7 +410,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldCallPreSetValueCallbackOnSetValue()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -434,7 +434,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldAllowModifyValueInPreSetValueCallback()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -456,7 +456,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldCallPostSetValueCallbackOnSetValue()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -479,7 +479,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldCallPostGetValueCallbackOnGetValue()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -505,7 +505,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldAllowModifyValueInPostGetValueCallback()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         HookStorage::clearAll();
 
@@ -530,13 +530,13 @@ class HookStorageTest extends TestCase
         $isCalled = false;
         $actualObj = null;
 
-        HookStorage::register(Object::class, 'post_build_object', function() use (&$actualObj, &$isCalled) {
+        HookStorage::register(EmptyObject::class, 'post_build_object', function() use (&$actualObj, &$isCalled) {
             $isCalled = true;
 
             $actualObj = func_get_arg(0);
         });
 
-        $obj = build_object(Object::class, $values);
+        $obj = build_object(EmptyObject::class, $values);
 
         self::assertTrue($isCalled);
         self::assertSame($obj, $actualObj);
@@ -544,14 +544,14 @@ class HookStorageTest extends TestCase
 
     public function testShouldCallPostBuildObjectCallbackOnBuildObjectWithContext()
     {
-        $parentObj = new Object();
+        $parentObj = new EmptyObject();
 
         $values = [];
 
         $isCalled = false;
         $actualObj = null;
 
-        HookStorage::register(Object::class, 'post_build_sub_object', function() use ($parentObj, &$actualObj, &$isCalled) {
+        HookStorage::register(EmptyObject::class, 'post_build_sub_object', function() use ($parentObj, &$actualObj, &$isCalled) {
             $isCalled = true;
 
             $actualObj = func_get_arg(0);
@@ -559,7 +559,7 @@ class HookStorageTest extends TestCase
             self::assertSame('aParentKey', func_get_arg(2));
         });
 
-        $obj = build_object_ref(Object::class, $values, $parentObj, 'aParentKey');
+        $obj = build_object_ref(EmptyObject::class, $values, $parentObj, 'aParentKey');
 
         self::assertTrue($isCalled);
         self::assertSame($obj, $actualObj);
@@ -567,7 +567,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldCallPostSetObjectCallbackOnSetObject()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         $subObj = new SubObject();
 
         $isCalled = false;
@@ -588,7 +588,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldCallPostAddObjectCallbackOnAddObject()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         $subObj = new SubObject();
 
         $isCalled = false;
@@ -609,7 +609,7 @@ class HookStorageTest extends TestCase
 
     public function testShouldCallPostSetObjectCallbackOnSetObjects()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         $subObj = new SubObject();
 
         $isCalled = false;
@@ -636,7 +636,7 @@ class HookStorageTest extends TestCase
             ],
         ];
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_values($obj, $values);
 
         $isCalled = false;
