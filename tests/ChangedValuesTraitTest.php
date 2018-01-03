@@ -3,7 +3,7 @@ namespace Makasim\Values\Tests;
 
 use function Makasim\Values\clone_object;
 use function Makasim\Values\set_values;
-use Makasim\Values\Tests\Model\Object;
+use Makasim\Values\Tests\Model\EmptyObject;
 use PHPUnit\Framework\TestCase;
 
 class ChangedValuesTraitTest extends TestCase
@@ -12,7 +12,7 @@ class ChangedValuesTraitTest extends TestCase
     {
         $values = ['foo' => 'fooVal', 'bar' => ['bar1' => 'bar1Val', 'bar2' => 'bar2Val']];
 
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         //guard
         self::assertChangedValuesSame([], $obj);
@@ -24,17 +24,17 @@ class ChangedValuesTraitTest extends TestCase
 
     public function testShouldTrackSetNewValue()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setValue('aKey', 'aVal');
 
         self::assertChangedValuesSame(['aKey' => 'aVal'], $obj);
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setValue('aNamespace.aKey', 'aVal');
 
         self::assertChangedValuesSame(['aNamespace' => ['aKey' => 'aVal']], $obj);
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setValue('aNamespace.4', 'aVal');
 
         self::assertChangedValuesSame(['aNamespace' => [4 => 'aVal']], $obj);
@@ -42,7 +42,7 @@ class ChangedValuesTraitTest extends TestCase
 
     public function testShouldResetChangedValuesOnSetValues()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setValue('aKey', 'aVal');
 
         self::assertChangedValuesSame(['aKey' => 'aVal'], $obj);
@@ -54,7 +54,7 @@ class ChangedValuesTraitTest extends TestCase
 
     public function testShouldTrackValueUnset()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setValue('aName.aKey', 'aVal');
 
         self::assertChangedValuesSame(['aName' => ['aKey' => 'aVal']], $obj);
@@ -66,7 +66,7 @@ class ChangedValuesTraitTest extends TestCase
 
     public function testShouldTrackValueAddedToEmptyArray()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->addValue('aNamespace.aKey', 'aVal');
 
         self::assertChangedValuesSame(['aNamespace' => ['aKey' => ['aVal']]], $obj);
@@ -76,7 +76,7 @@ class ChangedValuesTraitTest extends TestCase
     {
         $values = ['aNamespace' => ['aKey' => ['aVal']]];
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_values($obj, $values);
         $obj->addValue('aNamespace.aKey', 'aNewVal');
 
@@ -85,7 +85,7 @@ class ChangedValuesTraitTest extends TestCase
 
     public function testShouldNotReflectChangesOnClonedObject()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setValue('aKey', 'foo');
 
         $clonedObj = clone_object($obj);

@@ -8,7 +8,7 @@ use function Makasim\Values\get_value;
 use function Makasim\Values\get_values;
 use function Makasim\Values\set_value;
 use function Makasim\Values\set_values;
-use Makasim\Values\Tests\Model\Object;
+use Makasim\Values\Tests\Model\EmptyObject;
 use Makasim\Values\ValuesTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +18,7 @@ class ValuesTest extends TestCase
     {
         $values = ['foo' => 'fooVal', 'bar' => ['bar1' => 'bar1Val', 'bar2' => 'bar2Val']];
 
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         set_values($obj, $values);
 
@@ -27,7 +27,7 @@ class ValuesTest extends TestCase
 
     public function testShouldAllowSetNewValueAndGetPreviouslySet()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_value($obj, 'aKey', 'aVal');
 
         self::assertSame('aVal', get_value($obj, 'aKey'));
@@ -36,7 +36,7 @@ class ValuesTest extends TestCase
 
     public function testShouldAllowSetNewNameSpacedValueAndGetPreviouslySet()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_value($obj, 'aNamespace.aKey', 'aVal');
 
         self::assertSame('aVal', get_value($obj, 'aNamespace.aKey'));
@@ -45,7 +45,7 @@ class ValuesTest extends TestCase
 
     public function testShouldAllowGetDefaultValueIfSimpleValueNotSet()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         self::assertSame('aDefaultVal', get_value($obj, 'aKey', 'aDefaultVal'));
 
@@ -56,7 +56,7 @@ class ValuesTest extends TestCase
 
     public function testShouldAllowGetDefaultValueIfNameSpacedValueNotSet()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         self::assertSame('aDefaultVal', get_value($obj, 'aNamespace.aKey', 'aDefaultVal'));
 
@@ -67,7 +67,7 @@ class ValuesTest extends TestCase
 
     public function testShouldResetChangedValuesOnSetValues()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_value($obj, 'aNamespace.aKey', 'aVal');
 
         self::assertSame(['aNamespace' => ['aKey' => 'aVal']], get_values($obj));
@@ -80,7 +80,7 @@ class ValuesTest extends TestCase
 
     public function testShouldAllowUnsetPreviouslySetSimpleValue()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_value($obj, 'aKey', 'aVal');
         set_value($obj, 'anotherKey', 'anotherVal');
 
@@ -95,7 +95,7 @@ class ValuesTest extends TestCase
 
     public function testShouldAllowUnsetPreviouslySetNameSpacedValue()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_value($obj, 'aName.aKey', 'aVal');
         set_value($obj, 'anotherName.aKey', 'anotherVal');
 
@@ -122,7 +122,7 @@ class ValuesTest extends TestCase
 
     public function testShouldAllowAddSimpleValueToEmptyArray()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         add_value($obj, 'aKey', 'aVal');
 
         self::assertSame(['aVal'], get_value($obj, 'aKey'));
@@ -131,7 +131,7 @@ class ValuesTest extends TestCase
 
     public function testShouldAllowAddSeveralSimpleValuesToEmptyArray()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         add_value($obj, 'aKey', 'foo');
         add_value($obj, 'aKey', 'bar');
         add_value($obj, 'aKey', 'baz', 'customKey');
@@ -152,7 +152,7 @@ class ValuesTest extends TestCase
 
     public function testAddValueReturnsAddedValueKey()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         self::assertSame(0, add_value($obj, 'aKey', 'aVal'));
         self::assertSame('customKey', add_value($obj, 'aKey', 'aVal', 'customKey'));
@@ -161,7 +161,7 @@ class ValuesTest extends TestCase
 
     public function testShouldAllowAddNameSpacedValueToEmptyArray()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         add_value($obj, 'aNamespace.aKey', 'aVal');
 
         self::assertSame(['aVal'], get_value($obj, 'aNamespace.aKey'));
@@ -172,7 +172,7 @@ class ValuesTest extends TestCase
     {
         $values = ['aKey' => ['aVal']];
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_values($obj, $values);
 
         add_value($obj, 'aKey', 'aNewVal');
@@ -185,7 +185,7 @@ class ValuesTest extends TestCase
     {
         $values = ['aNamespace' => ['aKey' => ['aVal']]];
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_values($obj, $values);
 
         add_value($obj, 'aNamespace.aKey', 'aNewVal');
@@ -196,7 +196,7 @@ class ValuesTest extends TestCase
 
     public function testShouldAllowAddValueWithCustomValueKeyThatContainsDot()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         add_value($obj, 'aKey', 'aVal', 'valueKey.withDot');
 
@@ -212,7 +212,7 @@ class ValuesTest extends TestCase
     {
         $values = ['aNamespace' => ['aKey' => 'aVal']];
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_values($obj, $values);
 
         add_value($obj, 'aNamespace.aKey', 'aVal');
@@ -220,7 +220,7 @@ class ValuesTest extends TestCase
 
     public function testShouldNotReflectChangesOnClonedObject()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_value($obj, 'aNamespace.aKey', 'foo');
 
         $clonedObj = clone_object($obj);
@@ -232,7 +232,7 @@ class ValuesTest extends TestCase
 
     public function testShouldReplaceStringValueWithArray()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         set_value($obj, 'aKey', 'foo');
         set_value($obj, 'aKey.aSubKey', 'bar');

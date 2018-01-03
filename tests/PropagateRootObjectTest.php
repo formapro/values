@@ -9,7 +9,7 @@ use function Makasim\Values\register_propagate_root_hooks;
 use function Makasim\Values\set_object;
 use function Makasim\Values\set_objects;
 use function Makasim\Values\set_values;
-use Makasim\Values\Tests\Model\Object;
+use Makasim\Values\Tests\Model\EmptyObject;
 use Makasim\Values\Tests\Model\SubObject;
 use PHPUnit\Framework\TestCase;
 
@@ -31,8 +31,8 @@ class PropagateRootObjectTest extends TestCase
 
     public function testShouldSetRootObjectToSubObjectOnSetObject()
     {
-        $subObj = new Object();
-        $obj = new Object();
+        $subObj = new EmptyObject();
+        $obj = new EmptyObject();
 
         register_propagate_root_hooks($obj);
 
@@ -46,7 +46,7 @@ class PropagateRootObjectTest extends TestCase
     {
         $fooSubObj = new SubObject();
         $barSubObj = new SubObject();
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         register_propagate_root_hooks($obj);
 
@@ -62,7 +62,7 @@ class PropagateRootObjectTest extends TestCase
     public function testShouldSetRootObjectToAddedObjectOnAddObject()
     {
         $fooSubObj = new SubObject();
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         register_propagate_root_hooks($obj);
 
@@ -75,7 +75,7 @@ class PropagateRootObjectTest extends TestCase
     public function testShouldSetRootObjectToEverySubObjectOnGetObjects()
     {
         $values = ['aKey' => [[], []]];
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         set_values($obj, $values);
 
@@ -97,7 +97,7 @@ class PropagateRootObjectTest extends TestCase
 
     public function testShouldSetRootObjectToSubObjectOnGetObject()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         $values = [
             'aKey' => []
