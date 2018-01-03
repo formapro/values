@@ -11,7 +11,7 @@ use Makasim\Values\HookStorage;
 use function Makasim\Values\register_hook;
 use function Makasim\Values\register_object_hooks;
 use function Makasim\Values\set_values;
-use Makasim\Values\Tests\Model\Object;
+use Makasim\Values\Tests\Model\EmptyObject;
 use Makasim\Values\Tests\Model\OtherSubObject;
 use Makasim\Values\Tests\Model\SubObject;
 use PHPUnit\Framework\TestCase;
@@ -39,7 +39,7 @@ class ObjectsTraitTest extends TestCase
         $subObj = new SubObject();
         $subObj->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setObject('aName.aKey', $subObj);
 
         self::assertAttributeNotEmpty('values', $obj);
@@ -57,7 +57,7 @@ class ObjectsTraitTest extends TestCase
         $subObj = new SubObject();
         $subObj->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setObject('aName.aKey', $subObj);
 
         self::assertSame($subObj, $obj->getObject('aName.aKey', SubObject::class));
@@ -68,7 +68,7 @@ class ObjectsTraitTest extends TestCase
 
     public function testShouldCreateObjectOnGet()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         $values = ['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]];
         set_values($obj, $values);
@@ -82,7 +82,7 @@ class ObjectsTraitTest extends TestCase
 
     public function testShouldReturnNullIfValueNotSet()
     {
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         self::assertNull($obj->getObject('aName.aKey', SubObject::class));
     }
@@ -92,7 +92,7 @@ class ObjectsTraitTest extends TestCase
         $subObj = new SubObject();
         $subObj->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setObject('aName.aKey', $subObj);
 
         self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]], get_values($obj));
@@ -109,10 +109,10 @@ class ObjectsTraitTest extends TestCase
         $subSubObj = new SubObject();
         $subSubObj->setValue('aSubSubName.aSubSubKey', 'aFooVal');
 
-        $subObj = new Object();
+        $subObj = new EmptyObject();
         $subObj->setObject('aSubName.aSubKey', $subSubObj);
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setObject('aName.aKey', $subObj);
 
         self::assertSame(['aName' => ['aKey' => [
@@ -135,7 +135,7 @@ class ObjectsTraitTest extends TestCase
         $subObj = new SubObject();
         $subObj->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setObject('aName.aKey', $subObj);
 
         self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]], get_values($obj));
@@ -155,7 +155,7 @@ class ObjectsTraitTest extends TestCase
         $subObj = new SubObject();
         $subObj->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setObject('aName.aKey', $subObj);
 
         self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]], get_object_changed_values($obj));
@@ -166,7 +166,7 @@ class ObjectsTraitTest extends TestCase
         $subObj = new SubObject();
         $subObj->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setObject('aName.aKey', $subObj);
 
         self::assertAttributeSame(['aName' => ['aKey' => $subObj]], 'objects', $obj);
@@ -182,7 +182,7 @@ class ObjectsTraitTest extends TestCase
 
         $expectedSubClass = $this->getMockClass(SubObject::class);
 
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         $values = ['aName' => ['aKey' => $subObjValues]];
         set_values($obj, $values);
@@ -204,7 +204,7 @@ class ObjectsTraitTest extends TestCase
         $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setObjects('aName.aKey', [$subObjFoo, $subObjBar]);
 
         $objs = $obj->getObjects('aName.aKey', SubObject::class);
@@ -227,7 +227,7 @@ class ObjectsTraitTest extends TestCase
             ['aSubName' => ['aSubKey' => 'aBarVal']],
         ]]];
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_values($obj, $values);
 
         $subObjs = $obj->getObjects('aName.aKey', SubObject::class);
@@ -248,7 +248,7 @@ class ObjectsTraitTest extends TestCase
             ['aSubName' => ['aSubKey' => 'aFooVal']],
         ]]];
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_values($obj, $values);
 
         $this->expectException(\LogicException::class);
@@ -266,7 +266,7 @@ class ObjectsTraitTest extends TestCase
         $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->addObject('aName.aKey', $subObjFoo);
         $obj->addObject('aName.aKey', $subObjBar);
 
@@ -292,7 +292,7 @@ class ObjectsTraitTest extends TestCase
             ['aSubName' => ['aSubKey' => 'aFooVal']],
         ]]];
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_values($obj, $values);
 
         $subObjBar = new SubObject();
@@ -324,7 +324,7 @@ class ObjectsTraitTest extends TestCase
         $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         self::assertAttributeEmpty('changedValues', $obj);
 
@@ -344,7 +344,7 @@ class ObjectsTraitTest extends TestCase
         $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
 
         self::assertAttributeEmpty('changedValues', $obj);
 
@@ -370,7 +370,7 @@ class ObjectsTraitTest extends TestCase
         $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setObjects('aName.aKey', [$subObjFoo, $subObjBar]);
 
         self::assertSame(['aName' => ['aKey' => [
@@ -398,7 +398,7 @@ class ObjectsTraitTest extends TestCase
         $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setObjects('aName.aKey', [$subObjFoo, $subObjBar]);
 
         self::assertSame(['aName' => ['aKey' => [
@@ -430,7 +430,7 @@ class ObjectsTraitTest extends TestCase
             ],
         ];
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_values($obj, $values);
 
         //guard
@@ -469,7 +469,7 @@ class ObjectsTraitTest extends TestCase
             ],
         ];
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_values($obj, $values);
 
         //guard
@@ -505,7 +505,7 @@ class ObjectsTraitTest extends TestCase
             ],
         ];
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_values($obj, $values);
 
         //guard
@@ -528,7 +528,7 @@ class ObjectsTraitTest extends TestCase
             ],
         ];
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_values($obj, $values);
 
         //guard
@@ -557,10 +557,10 @@ class ObjectsTraitTest extends TestCase
         $subObjFoo = new SubObject();
         $subObjFoo->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setObject('self.aKey', $subObjFoo);
 
-        self::assertSame($subObjFoo, $obj->getObject('self.aKey', Object::class));
+        self::assertSame($subObjFoo, $obj->getObject('self.aKey', EmptyObject::class));
         self::assertSame(['self' => ['aKey' =>
             ['aSubName' => ['aSubKey' => 'aFooVal']],
         ]], get_values($obj));
@@ -575,7 +575,7 @@ class ObjectsTraitTest extends TestCase
         $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setObjects('self.aKey', [$subObjFoo, $subObjBar]);
 
         $objs = $obj->getObjects('self.aKey', SubObject::class);
@@ -599,7 +599,7 @@ class ObjectsTraitTest extends TestCase
         $subObjBar = new SubObject();
         $subObjBar->setValue('aSubName.aSubKey', 'aBarVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->addObject('self.aKey', $subObjFoo);
         $obj->addObject('self.aKey', $subObjBar);
 
@@ -624,7 +624,7 @@ class ObjectsTraitTest extends TestCase
         $subObjBar = new SubObject();
         $subObjBar->setValue('aSubKey', 'aBarVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setObject('aKey', $subObjFoo);
 
         $obj->setObject('aKey', $subObjBar);
@@ -642,7 +642,7 @@ class ObjectsTraitTest extends TestCase
             ],
         ];
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_values($obj, $values);
 
         $this->expectException(\LogicException::class);
@@ -658,7 +658,7 @@ class ObjectsTraitTest extends TestCase
             ],
         ];
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_values($obj, $values);
 
         register_hook(HooksEnum::BUILD_OBJECT, HooksEnum::GET_OBJECT_CLASS, function($object, $key, $values) {
@@ -681,7 +681,7 @@ class ObjectsTraitTest extends TestCase
         $argumentClass = SubObject::class;
         $hookClass = OtherSubObject::class;
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         set_values($obj, $values);
 
         register_hook(HooksEnum::BUILD_OBJECT, HooksEnum::GET_OBJECT_CLASS, function($object, $key, $values) use ($hookClass) {
@@ -698,7 +698,7 @@ class ObjectsTraitTest extends TestCase
         $subObj = new SubObject();
         $subObj->setValue('aSubName.aSubKey', 'aFooVal');
 
-        $obj = new Object();
+        $obj = new EmptyObject();
         $obj->setObject('aName.aKey', $subObj);
 
         $values = get_values($obj); // copy must be true by default
