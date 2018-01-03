@@ -17,7 +17,7 @@ function set_values($object, array &$values, bool $byReference = false)
             $this->values = $values;
         }
 
-        foreach (get_registered_hooks($this, 'post_set_values') as $callback) {
+        foreach (get_registered_hooks($this, HooksEnum::POST_SET_VALUES) as $callback) {
             call_user_func($callback, $this, $values, $byReference);
         }
 
@@ -37,7 +37,7 @@ function get_values($object, bool $copy = true): array
 function add_value($object, $key, $value, $valueKey = null)
 {
     return (function($key, $value, $valueKey) {
-        foreach (get_registered_hooks($this, 'pre_add_value') as $callback) {
+        foreach (get_registered_hooks($this, HooksEnum::PRE_ADD_VALUE) as $callback) {
             if (null !== $changedValue = call_user_func($callback, $this, $key, $value)) {
                 $value = $changedValue;
             }
@@ -64,7 +64,7 @@ function add_value($object, $key, $value, $valueKey = null)
             $modified = array_set($key, $newValue, $this->values);
         }
 
-        foreach (get_registered_hooks($this, 'post_add_value') as $callback) {
+        foreach (get_registered_hooks($this, HooksEnum::POST_ADD_VALUE) as $callback) {
             call_user_func($callback, $this, $key.'.'.$valueKey, $value, $modified);
         }
 
@@ -75,7 +75,7 @@ function add_value($object, $key, $value, $valueKey = null)
 function set_value($object, $key, $value)
 {
     return (function($key, $value) {
-        foreach (get_registered_hooks($this, 'pre_set_value') as $callback) {
+        foreach (get_registered_hooks($this, HooksEnum::PRE_SET_VALUE) as $callback) {
             if (null !== $newValue = call_user_func($callback, $this, $key, $value)) {
                 $value = $newValue;
             }
@@ -87,7 +87,7 @@ function set_value($object, $key, $value)
             $modified = array_unset($key, $this->values);
         }
 
-        foreach (get_registered_hooks($this, 'post_set_value') as $callback) {
+        foreach (get_registered_hooks($this, HooksEnum::POST_SET_VALUE) as $callback) {
             call_user_func($callback, $this, $key, $value, $modified);
         }
     })->call($object, $key, $value);
@@ -98,7 +98,7 @@ function get_value($object, $key, $default = null, $castTo = null)
     return (function($key, $default, $castTo) {
         $value = array_get($key, $default , $this->values);
 
-        foreach (get_registered_hooks($this, 'post_get_value') as $callback) {
+        foreach (get_registered_hooks($this, HooksEnum::POST_GET_VALUE) as $callback) {
             if (null !== $newValue = call_user_func($callback, $this, $key, $value, $default, $castTo)) {
                 $value = $newValue;
             }
@@ -149,7 +149,7 @@ function get_object_changed_values($object)
  */
 function build_object_ref($classOrCallable = null, array &$values, $context = null, $contextKey = null)
 {
-    foreach (get_registered_hooks('build_object', 'get_object_class') as $callback) {
+    foreach (get_registered_hooks(HooksEnum::BUILD_OBJECT, HooksEnum::GET_OBJECT_CLASS) as $callback) {
         if ($dynamicClassOrCallable = call_user_func($callback, $values, $context, $contextKey)) {
             $classOrCallable = $dynamicClassOrCallable;
         }
@@ -186,11 +186,11 @@ function build_object_ref($classOrCallable = null, array &$values, $context = nu
     set_values($object, $values, true);
 
     if ($context) {
-        foreach (get_registered_hooks($context, 'post_build_sub_object') as $callback) {
+        foreach (get_registered_hooks($context, HooksEnum::POST_BUILD_SUB_OBJECT) as $callback) {
             call_user_func($callback, $object, $context, $contextKey);
         }
     } else {
-        foreach (get_registered_hooks($object, 'post_build_object') as $callback) {
+        foreach (get_registered_hooks($object, HooksEnum::POST_BUILD_OBJECT) as $callback) {
             call_user_func($callback, $object);
         }
     }
@@ -232,13 +232,13 @@ function register_cast_hooks($objectOrClass = null) {
     };
 
     if ($objectOrClass) {
-        register_hook($objectOrClass, 'pre_set_value', $castValueHook);
-        register_hook($objectOrClass, 'pre_add_value', $castValueHook);
-        register_hook($objectOrClass, 'post_get_value', $castToHook);
+        register_hook($objectOrClass, HooksEnum::PRE_SET_VALUE, $castValueHook);
+        register_hook($objectOrClass, HooksEnum::PRE_ADD_VALUE, $castValueHook);
+        register_hook($objectOrClass, HooksEnum::POST_GET_VALUE, $castToHook);
     } else {
-        register_global_hook('pre_set_value', $castValueHook);
-        register_global_hook('pre_add_value', $castValueHook);
-        register_global_hook('post_get_value', $castToHook);
+        register_global_hook(HooksEnum::PRE_SET_VALUE, $castValueHook);
+        register_global_hook(HooksEnum::PRE_ADD_VALUE, $castValueHook);
+        register_global_hook(HooksEnum::POST_GET_VALUE, $castToHook);
     }
 }
 

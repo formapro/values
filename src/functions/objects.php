@@ -18,7 +18,7 @@ function set_object($context, $key, $object)
 
             array_set($key, $object, $this->objects);
 
-            foreach (get_registered_hooks($context, 'post_set_object') as $callback) {
+            foreach (get_registered_hooks($context, HooksEnum::POST_SET_OBJECT) as $callback) {
                 call_user_func($callback, $object, $context, $key);
             }
         } else {
@@ -52,7 +52,7 @@ function set_objects($context, $key, $objects)
 
                 array_set($key.'.'.$objectKey, $object, $this->objects);
 
-                foreach (get_registered_hooks($context, 'post_set_object') as $callback) {
+                foreach (get_registered_hooks($context, HooksEnum::POST_SET_OBJECT) as $callback) {
                     call_user_func($callback, $object, $context, $key.'.'.$objectKey);
                 }
             }
@@ -80,7 +80,7 @@ function add_object($context, $key, $object, $objectKey = null)
 
         array_set($key.'.'.$objectKey, $object, $this->objects);
 
-        foreach (get_registered_hooks($context, 'post_add_object') as $callback) {
+        foreach (get_registered_hooks($context, HooksEnum::POST_ADD_OBJECT) as $callback) {
             call_user_func($callback, $object, $context, $key.'.'.$objectKey);
         }
 
@@ -145,9 +145,9 @@ function register_object_hooks()
         });
     };
 
-    register_global_hook('post_set_value', $resetObjectsHook);
-    register_global_hook('post_add_value', $resetObjectsHook);
-    register_global_hook('post_set_values', function($object) {
+    register_global_hook(HooksEnum::POST_SET_VALUE, $resetObjectsHook);
+    register_global_hook(HooksEnum::POST_ADD_VALUE, $resetObjectsHook);
+    register_global_hook(HooksEnum::POST_SET_VALUES, function($object) {
         call($object, function() {
             $this->objects = [];
         });
@@ -156,15 +156,15 @@ function register_object_hooks()
 
 function register_propagate_root_hooks($object)
 {
-    register_hook($object, 'post_set_object', function ($object, $context, $contextKey) {
+    register_hook($object, HooksEnum::POST_SET_OBJECT, function ($object, $context, $contextKey) {
         propagate_root($object, $context, $contextKey);
     });
 
-    register_hook($object, 'post_add_object', function ($object, $context, $contextKey) {
+    register_hook($object, HooksEnum::POST_ADD_OBJECT, function ($object, $context, $contextKey) {
         propagate_root($object, $context, $contextKey);
     });
 
-    register_hook($object, 'post_build_sub_object', function ($object, $context, $contextKey) {
+    register_hook($object, HooksEnum::POST_BUILD_SUB_OBJECT, function ($object, $context, $contextKey) {
         register_propagate_root_hooks($object);
         propagate_root($object, $context, $contextKey);
     });

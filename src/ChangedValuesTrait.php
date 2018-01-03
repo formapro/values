@@ -28,8 +28,8 @@ trait ChangedValuesTrait
             return $value;
         };
 
-        register_hook(get_class($this), 'post_set_values', $resetChangedValuesHook);
-        register_hook(get_class($this), 'post_set_value', $trackChangesHook);
-        register_hook(get_class($this), 'post_add_value', $trackChangesHook);
+        register_hook(get_class($this), HooksEnum::POST_SET_VALUES, $resetChangedValuesHook);
+        register_hook(get_class($this), HooksEnum::POST_SET_VALUE, $trackChangesHook);
+        register_hook(get_class($this), HooksEnum::POST_ADD_VALUE, $trackChangesHook);
     }
 }
