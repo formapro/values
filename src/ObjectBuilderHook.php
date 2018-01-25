@@ -25,7 +25,7 @@ class ObjectBuilderHook
 
     public function register()
     {
-        register_global_hook('get_object_class', function(array $values) {
+        register_global_hook(HooksEnum::GET_OBJECT_CLASS, function(array $values) {
             if (false == isset($values[$this->fieldName])) {
                 return;
             }

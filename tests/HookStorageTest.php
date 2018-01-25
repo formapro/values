@@ -7,6 +7,7 @@ use function Makasim\Values\build_object;
 use function Makasim\Values\build_object_ref;
 use function Makasim\Values\get_object;
 use function Makasim\Values\get_value;
+use Makasim\Values\HooksEnum;
 use Makasim\Values\HookStorage;
 use function Makasim\Values\set_object;
 use function Makasim\Values\set_objects;
@@ -287,7 +288,7 @@ class HookStorageTest extends TestCase
         $isCalled = false;
         $values = ['foo' => 'bar'];
 
-        HookStorage::register($obj, 'post_set_values', function() use ($obj, $values, &$isCalled) {
+        HookStorage::register($obj, HooksEnum::POST_SET_VALUES, function() use ($obj, $values, &$isCalled) {
             $isCalled = true;
 
             self::assertSame($obj, func_get_arg(0));
@@ -308,7 +309,7 @@ class HookStorageTest extends TestCase
         $isCalled = false;
         $values = ['foo' => 'bar'];
 
-        HookStorage::register($obj, 'post_set_values', function() use ($obj, $values, &$isCalled) {
+        HookStorage::register($obj, HooksEnum::POST_SET_VALUES, function() use ($obj, $values, &$isCalled) {
             $isCalled = true;
 
             self::assertTrue(func_get_arg(2));
@@ -328,7 +329,7 @@ class HookStorageTest extends TestCase
         $value = 'bar';
         $key = 'foo';
 
-        HookStorage::register($obj, 'pre_add_value', function() use ($obj, $key, $value, &$isCalled) {
+        HookStorage::register($obj, HooksEnum::PRE_ADD_VALUE, function() use ($obj, $key, $value, &$isCalled) {
             $isCalled = true;
 
             self::assertSame($obj, func_get_arg(0));
@@ -352,7 +353,7 @@ class HookStorageTest extends TestCase
         $value = 'bar';
         $key = 'foo';
 
-        HookStorage::register($obj, 'pre_add_value', function() use (&$isCalled) {
+        HookStorage::register($obj, HooksEnum::PRE_ADD_VALUE, function() use (&$isCalled) {
             $isCalled = true;
 
             return 'baz';
@@ -374,7 +375,7 @@ class HookStorageTest extends TestCase
         $value = 'bar';
         $key = 'foo';
 
-        HookStorage::register($obj, 'post_add_value', function() use ($obj, $key, $value, &$isCalled) {
+        HookStorage::register($obj, HooksEnum::POST_ADD_VALUE, function() use ($obj, $key, $value, &$isCalled) {
             $isCalled = true;
 
             self::assertSame($obj, func_get_arg(0));
@@ -398,7 +399,7 @@ class HookStorageTest extends TestCase
         $valueKey = 'valKey';
         $key = 'foo';
 
-        HookStorage::register($obj, 'post_add_value', function() use ($key, $valueKey, &$isCalled) {
+        HookStorage::register($obj, HooksEnum::POST_ADD_VALUE, function() use ($key, $valueKey, &$isCalled) {
             $isCalled = true;
 
             self::assertSame($key.'.'.$valueKey, func_get_arg(1));
@@ -418,7 +419,7 @@ class HookStorageTest extends TestCase
         $value = 'bar';
         $key = 'foo';
 
-        HookStorage::register($obj, 'pre_set_value', function() use ($obj, $key, $value, &$isCalled) {
+        HookStorage::register($obj, HooksEnum::PRE_SET_VALUE, function() use ($obj, $key, $value, &$isCalled) {
             $isCalled = true;
 
             self::assertSame($obj, func_get_arg(0));
@@ -442,7 +443,7 @@ class HookStorageTest extends TestCase
         $value = 'bar';
         $key = 'foo';
 
-        HookStorage::register($obj, 'pre_set_value', function() use (&$isCalled) {
+        HookStorage::register($obj, HooksEnum::PRE_SET_VALUE, function() use (&$isCalled) {
             $isCalled = true;
 
             return 'baz';
@@ -464,7 +465,7 @@ class HookStorageTest extends TestCase
         $value = 'bar';
         $key = 'foo';
 
-        HookStorage::register($obj, 'post_set_value', function() use ($obj, $key, $value, &$isCalled) {
+        HookStorage::register($obj, HooksEnum::POST_SET_VALUE, function() use ($obj, $key, $value, &$isCalled) {
             $isCalled = true;
 
             self::assertSame($obj, func_get_arg(0));
@@ -489,7 +490,7 @@ class HookStorageTest extends TestCase
 
         set_value($obj, $key, $value);
 
-        HookStorage::register($obj, 'post_get_value', function() use ($obj, $key, $value, &$isCalled) {
+        HookStorage::register($obj, HooksEnum::POST_GET_VALUE, function() use ($obj, $key, $value, &$isCalled) {
             $isCalled = true;
 
             self::assertSame($obj, func_get_arg(0));
@@ -513,7 +514,7 @@ class HookStorageTest extends TestCase
 
         set_value($obj, 'foo', 'bar');
 
-        HookStorage::register($obj, 'post_get_value', function() use (&$isCalled) {
+        HookStorage::register($obj, HooksEnum::POST_GET_VALUE, function() use (&$isCalled) {
             $isCalled = true;
 
             return 'baz';
@@ -530,7 +531,7 @@ class HookStorageTest extends TestCase
         $isCalled = false;
         $actualObj = null;
 
-        HookStorage::register(EmptyObject::class, 'post_build_object', function() use (&$actualObj, &$isCalled) {
+        HookStorage::register(EmptyObject::class, HooksEnum::POST_BUILD_OBJECT, function() use (&$actualObj, &$isCalled) {
             $isCalled = true;
 
             $actualObj = func_get_arg(0);
@@ -551,7 +552,7 @@ class HookStorageTest extends TestCase
         $isCalled = false;
         $actualObj = null;
 
-        HookStorage::register(EmptyObject::class, 'post_build_sub_object', function() use ($parentObj, &$actualObj, &$isCalled) {
+        HookStorage::register(EmptyObject::class, HooksEnum::POST_BUILD_SUB_OBJECT, function() use ($parentObj, &$actualObj, &$isCalled) {
             $isCalled = true;
 
             $actualObj = func_get_arg(0);
@@ -573,7 +574,7 @@ class HookStorageTest extends TestCase
         $isCalled = false;
         $actualObj = null;
 
-        HookStorage::register($obj, 'post_set_object', function() use ($subObj, $obj, &$isCalled) {
+        HookStorage::register($obj, HooksEnum::POST_SET_OBJECT, function() use ($subObj, $obj, &$isCalled) {
             $isCalled = true;
 
             self::assertSame($subObj, func_get_arg(0));
@@ -594,7 +595,7 @@ class HookStorageTest extends TestCase
         $isCalled = false;
         $actualObj = null;
 
-        HookStorage::register($obj, 'post_add_object', function() use ($subObj, $obj, &$isCalled) {
+        HookStorage::register($obj, HooksEnum::POST_ADD_OBJECT, function() use ($subObj, $obj, &$isCalled) {
             $isCalled = true;
 
             self::assertSame($subObj, func_get_arg(0));
@@ -615,7 +616,7 @@ class HookStorageTest extends TestCase
         $isCalled = false;
         $actualObj = null;
 
-        HookStorage::register($obj, 'post_set_object', function() use ($subObj, $obj, &$isCalled) {
+        HookStorage::register($obj, HooksEnum::POST_SET_OBJECT, function() use ($subObj, $obj, &$isCalled) {
             $isCalled = true;
 
             self::assertSame($subObj, func_get_arg(0));
@@ -642,7 +643,7 @@ class HookStorageTest extends TestCase
         $isCalled = false;
         $actualObj = null;
 
-        HookStorage::register('build_object', 'get_object_class', function() use ($obj, &$isCalled) {
+        HookStorage::register(HooksEnum::BUILD_OBJECT, HooksEnum::GET_OBJECT_CLASS, function() use ($obj, &$isCalled) {
             $isCalled = true;
 
             self::assertSame(['aSubKey' => 'aFooVal'], func_get_arg(0));

@@ -6,6 +6,7 @@ use function Makasim\Values\get_object;
 use function Makasim\Values\get_objects;
 use function Makasim\Values\get_values;
 use function Makasim\Values\get_object_changed_values;
+use Makasim\Values\HooksEnum;
 use Makasim\Values\HookStorage;
 use function Makasim\Values\register_hook;
 use function Makasim\Values\register_object_hooks;
@@ -660,7 +661,7 @@ class ObjectsTraitTest extends TestCase
         $obj = new EmptyObject();
         set_values($obj, $values);
 
-        register_hook('build_object', 'get_object_class', function($object, $key, $values) {
+        register_hook(HooksEnum::BUILD_OBJECT, HooksEnum::GET_OBJECT_CLASS, function($object, $key, $values) {
             return SubObject::class;
         });
 
@@ -683,7 +684,7 @@ class ObjectsTraitTest extends TestCase
         $obj = new EmptyObject();
         set_values($obj, $values);
 
-        register_hook('build_object', 'get_object_class', function($object, $key, $values) use ($hookClass) {
+        register_hook(HooksEnum::BUILD_OBJECT, HooksEnum::GET_OBJECT_CLASS, function($object, $key, $values) use ($hookClass) {
             return $hookClass;
         });
 
