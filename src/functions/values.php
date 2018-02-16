@@ -150,7 +150,7 @@ function get_object_changed_values($object)
 function build_object_ref($classOrCallable = null, array &$values, $context = null, $contextKey = null)
 {
     foreach (get_registered_hooks(HooksEnum::BUILD_OBJECT, HooksEnum::GET_OBJECT_CLASS) as $callback) {
-        if ($dynamicClassOrCallable = call_user_func($callback, $values, $context, $contextKey)) {
+        if ($dynamicClassOrCallable = call_user_func($callback, $values, $context, $contextKey, $classOrCallable)) {
             $classOrCallable = $dynamicClassOrCallable;
         }
     }

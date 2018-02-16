@@ -12,6 +12,7 @@ use function Makasim\Values\register_hook;
 use function Makasim\Values\register_object_hooks;
 use function Makasim\Values\set_values;
 use Makasim\Values\Tests\Model\EmptyObject;
+use Makasim\Values\Tests\Model\ObjectInterface;
 use Makasim\Values\Tests\Model\OtherSubObject;
 use Makasim\Values\Tests\Model\SubObject;
 use PHPUnit\Framework\TestCase;
@@ -710,5 +711,27 @@ class ObjectsTraitTest extends TestCase
 
         self::assertSame(['aName' => ['aKey' => ['aSubName' => ['aSubKey' => 'aFooVal']]]], get_values($obj));
         self::assertSame(['aSubName' => ['aSubKey' => 'aFooVal']], get_values($subObj));
+    }
+
+    public function testClassProvidedByHookBasedOnInterface()
+    {
+        $values = [
+            'aKey' => [
+                'aSubName' => ['aSubKey' => 'aFooVal'],
+            ],
+        ];
+
+        $obj = new EmptyObject();
+        set_values($obj, $values);
+
+        register_hook(HooksEnum::BUILD_OBJECT, HooksEnum::GET_OBJECT_CLASS, function($values, $context, $contextKey, $classOrCallable) {
+            $this->assertSame(ObjectInterface::class, $classOrCallable);
+
+            return SubObject::class;
+        });
+
+        $subObj = get_object($obj, 'aKey', ObjectInterface::class);
+
+        $this->assertInstanceOf(SubObject::class, $subObj);
     }
 }
