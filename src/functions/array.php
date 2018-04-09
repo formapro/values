@@ -3,15 +3,16 @@ namespace Makasim\Values;
 
 function &array_get($key, $default, &$values)
 {
-    $keys = explode('.', $key);
-    $keyExists = null;
-    $value =& array_path_get($values, $keys, $keyExists);
-
-    if ($keyExists) {
-        return $value;
-    } else {
-        return $default;
+    if (preg_match('/\w\d\./', $key)) {
+        throw new \LogicException(sprintf('The key must contain only a-Z0-9 and "." symbols. Got "%s', $key));
     }
+
+    $path = str_replace('.', '\'][\'', $key);
+
+    $result = null;
+    eval('$result &= isset($values[\''.$path.'\']) ? $values[\''.$path.'\'] : $default;');
+
+    return $result;
 }
 
 /**
@@ -23,21 +24,33 @@ function &array_get($key, $default, &$values)
  */
 function array_set($key, $value, array &$values)
 {
-    $keys = explode('.', $key);
+    if (preg_match('/\w\d\./', $key)) {
+        throw new \LogicException(sprintf('The key must contain only a-Z0-9 and "." symbols. Got "%s', $key));
+    }
 
-    array_path_set($values, $keys, $value);
+    $path = str_replace('.', '\'][\'', $key);
 
-    return true;
+    $previousValue = null;
+    eval('
+        $previousValue = isset( $values[\''.$path.'\']) ? $values[\''.$path.'\'] : null;
+        $values[\''.$path.'\'] = $value;
+    ');
+
+    return $previousValue !== $value;
 }
 
 function array_has($key, array &$values)
 {
-    $keys = explode('.', $key);
+    if (preg_match('/\w\d\./', $key)) {
+        throw new \LogicException(sprintf('The key must contain only a-Z0-9 and "." symbols. Got "%s', $key));
+    }
 
-    $keyExists = null;
-    array_path_get($values, $keys, $keyExists);
+    $path = str_replace('.', '\'][\'', $key);
 
-    return $keyExists;
+    $result = false;
+    eval('$result = isset($values[\''.$path.'\']);');
+
+    return $result;
 }
 
 /**
@@ -48,69 +61,17 @@ function array_has($key, array &$values)
  */
 function array_unset($key, array &$values)
 {
-    $keys = explode('.', $key);
-
-    $keyExisted = false;
-    array_path_unset($values, $keys, $keyExisted);
-
-    return $keyExisted;
-}
-
-/**
- * @see https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Component%21Utility%21NestedArray.php/function/NestedArray%3A%3AsetValue/8
- */
-function array_path_set(array &$array, array $keys, $value, $force = false) {
-    $ref = &$array;
-    foreach ($keys as $parent) {
-        // PHP auto-creates container arrays and NULL entries without error if $ref
-        // is NULL, but throws an error if $ref is set, but not an array.
-        if ($force && isset($ref) && !is_array($ref)) {
-            $ref = array();
-        }
-
-        $ref = &$ref[$parent];
-
-        if (!is_array($ref)) {
-            $ref = [];
-        }
+    if (preg_match('/\w\d\./', $key)) {
+        throw new \LogicException(sprintf('The key must contain only a-Z0-9 and "." symbols. Got "%s', $key));
     }
 
-    $ref = $value;
-}
+    $path = str_replace('.', '\'][\'', $key);
 
-/**
- * @see https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Component%21Utility%21NestedArray.php/function/NestedArray%3A%3AgetValue/8
- */
-function &array_path_get(array &$array, array $parents, &$keyExists = null) {
-    $ref = &$array;
-    foreach ($parents as $parent) {
-        if (is_array($ref) && array_key_exists($parent, $ref)) {
-            $ref = &$ref[$parent];
-        } else {
-            $keyExists = false;
-            $null = null;
+    $result = false;
+    eval('$result = isset($values[\''.$path.'\']);');
+    eval('unset($values[\''.$path.'\']);');
 
-            return $null;
-        }
-    }
-
-    $keyExists = true;
-
-    return $ref;
-}
-
-/**
- * @see https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Component%21Utility%21NestedArray.php/function/NestedArray%3A%3AunsetValue/8
- */
-function array_path_unset(array &$array, array $parents, &$keyExisted = null) {
-    $unsetKey = array_pop($parents);
-    $ref =& array_path_get($array, $parents, $keyExisted);
-    if ($keyExisted && is_array($ref) && array_key_exists($unsetKey, $ref)) {
-        $keyExisted = TRUE;
-        unset($ref[$unsetKey]);
-    } else {
-        $keyExisted = FALSE;
-    }
+    return $result;
 }
 
 function array_copy(array $array)
