@@ -17,7 +17,12 @@ trait CastTrait
             } elseif (is_numeric($value)) {
                 $value = \DateTime::createFromFormat('U', $value);
             } elseif (is_array($value)) {
-                $value = \DateTime::createFromFormat('U', $value['unix']);
+                if (isset($value['tz'])) {
+                    $value = \DateTime::createFromFormat('Y-m-d\TH:i:s', $value['time'], new \DateTimeZone($value['tz']));
+                } else {
+                    // bc
+                    $value = \DateTime::createFromFormat('U', $value['unix']);
+                }
             } else {
                 $value = new \DateTime($value);
             }
@@ -28,6 +33,12 @@ trait CastTrait
                 $value = new \DateInterval($value['interval']);
             } else {
                 $value = new \DateInterval($value);
+            }
+        } else if (\DateTimeZone::class == $castTo) {
+            if (null === $value) {
+                return null;
+            } else {
+                $value = new \DateTimeZone($value['tz']);
             }
         } else {
             settype($value, $castTo);
@@ -46,7 +57,8 @@ trait CastTrait
         if ($value instanceof \DateTime) {
             $value = [
                 'unix' => (int) $value->format('U'),
-                'iso' => (string) $value->format(DATE_ISO8601),
+                'time' => (string) $value->format('Y-m-d\TH:i:s'),
+                'tz' => $value->getTimezone()->getName(),
             ];
         } elseif ($value instanceof \DateInterval) {
             $value = [
@@ -58,6 +70,10 @@ trait CastTrait
                 'h' => $value->h,
                 'i' => $value->i,
                 's' => $value->s,
+            ];
+        } elseif ($value instanceof \DateTimeZone) {
+            $value = [
+                'tz' => $value->getName(),
             ];
         }
         
