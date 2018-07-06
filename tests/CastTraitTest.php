@@ -99,18 +99,23 @@ class CastTraitTest extends TestCase
         self::assertEquals($timestamp, $actualDate->format('U'));
     }
 
-    public function testShouldAllowAddDateValueToArrayAndConvertToISO()
+    public function testShouldAllowAddDateValueToArrayAndConvertToDateAndTimeZone()
     {
-        $now = new \DateTime('now');
-        $timestamp = (int) $now->format('U');
-        $iso = $now->format(DATE_ISO8601);
+        $date = new \DateTime('2012-12-12 12:00:00', new \DateTimeZone('Europe/Kiev'));
+        $timestamp = (int) $date->format('U');
 
         $obj = new CastableObject();
-        $obj->addValue('aNamespace.aKey', $now);
+        $obj->addValue('aNamespace.aKey', $date);
 
-        self::assertSame([['unix' => $timestamp, 'iso' => $iso]], $obj->getValue('aNamespace.aKey'));
-        self::assertSame(['aNamespace' => ['aKey' => [['unix' => $timestamp, 'iso' => $iso]]]], get_values($obj));
-        self::assertSame(['aNamespace' => ['aKey' => [['unix' => $timestamp, 'iso' => $iso]]]], get_object_changed_values($obj));
+        $expectedValue = [
+            'unix' => $timestamp,
+            'time' => '2012-12-12T12:00:00',
+            'tz' => 'Europe/Kiev'
+        ];
+
+        self::assertSame([$expectedValue], $obj->getValue('aNamespace.aKey'));
+        self::assertSame(['aNamespace' => ['aKey' => [$expectedValue]]], get_values($obj));
+        self::assertSame(['aNamespace' => ['aKey' => [$expectedValue]]], get_object_changed_values($obj));
     }
 
     public function testShouldAllowAddDateIntervalValueToArray()
