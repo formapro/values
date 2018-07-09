@@ -8,7 +8,7 @@ The array is easy to fetch out or set into of the object.
 
 Could be used:
 
-* with [MongoDB](https://www.mongodb.com/) as lightweight (yet powerful) ODM.
+* with [MongoDB](https://www.mongodb.com/) as [lightweight (yet powerful) ODM](https://github.com/makasim/yadm).
 * with API by working with object but able to get arrays.
 * with message queues same as API.
 
