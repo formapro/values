@@ -1,6 +1,28 @@
 <?php
 namespace Makasim\Values;
 
+call_user_func(function() {
+    $resetObjectsHook = function($object, $key) {
+        call($object, $key, function($key) {
+            if (property_exists($this, 'objects')) {
+                array_unset($key, $this->objects);
+            }
+        });
+    };
+
+    register_global_hook(HooksEnum::POST_SET_VALUE, $resetObjectsHook);
+    register_global_hook(HooksEnum::POST_ADD_VALUE, $resetObjectsHook);
+    register_global_hook(HooksEnum::POST_SET_VALUES, function($object) {
+        call($object, function() {
+            $this->objects = [];
+        });
+    });
+});
+
+function register_object_hooks() {
+    // does nothing, is kept for BC. will be removed later.
+}
+
 /**
  * @param object      $context
  * @param string      $key
@@ -133,25 +155,6 @@ function get_objects($context, $key, $classOrClosure = null)
             yield $valueKey => $object;
         }
     })->call($context, $key, $classOrClosure);
-}
-
-function register_object_hooks()
-{
-    $resetObjectsHook = function($object, $key) {
-        call($object, $key, function($key) {
-            if (property_exists($this, 'objects')) {
-                array_unset($key, $this->objects);
-            }
-        });
-    };
-
-    register_global_hook(HooksEnum::POST_SET_VALUE, $resetObjectsHook);
-    register_global_hook(HooksEnum::POST_ADD_VALUE, $resetObjectsHook);
-    register_global_hook(HooksEnum::POST_SET_VALUES, function($object) {
-        call($object, function() {
-            $this->objects = [];
-        });
-    });
 }
 
 function register_propagate_root_hooks($object)
