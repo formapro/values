@@ -179,7 +179,7 @@ function propagate_root($object, $parentObject, $parentKey)
         return;
     }
 
-    [$rootObject, $rootObjectKey] = call($parentObject, $parentKey, function($parentKey) {
+    list($rootObject, $rootObjectKey) = call($parentObject, $parentKey, function($parentKey) {
        return [
            isset($this->rootObject) ?: $this,
            isset($this->rootObjectKey) ? $this->rootObjectKey.'.'.$parentKey : $parentKey
