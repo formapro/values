@@ -8,9 +8,10 @@ The array is easy to fetch out or set into of the object.
 
 Could be used:
 
-* with [MongoDB](https://www.mongodb.com/) as [lightweight (yet powerful) ODM](https://github.com/makasim/yadm).
-* with API by working with object but able to get arrays.
-* with message queues same as API.
+* interacting with [MongoDB](https://www.mongodb.com/) - [makasim/yadm](https://github.com/makasim/yadm).
+* describing API clients - [formapro/telegram-bot](https://github.com/formapro/telegram-bot-php).
+* describing domain models - [formapro/pvm](https://github.com/formapro/pvm)
+* describing MQ messages.
 
 **An object** provide us with a contract which is easy to rely on. We can type hint a class, use auto complete on its methods.
 That's a good part, but it is not easy or cheap to populate objects with data or take their current state. 
