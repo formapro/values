@@ -1,9 +1,9 @@
 <?php
-namespace Makasim\Values\Tests\Model;
+namespace Formapro\Values\Tests\Model;
 
-use Makasim\Values\ChangedValuesTrait;
-use Makasim\Values\ObjectsTrait;
-use Makasim\Values\ValuesTrait;
+use Formapro\Values\ChangedValuesTrait;
+use Formapro\Values\ObjectsTrait;
+use Formapro\Values\ValuesTrait;
 
 class EmptyObject
 {

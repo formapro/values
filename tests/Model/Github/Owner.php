@@ -1,7 +1,7 @@
 <?php
-namespace Makasim\Values\Tests\Model\Github;
+namespace Formapro\Values\Tests\Model\Github;
 
-use Makasim\Values\ValuesTrait;
+use Formapro\Values\ValuesTrait;
 
 class Owner
 {

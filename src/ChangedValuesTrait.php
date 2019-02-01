@@ -1,5 +1,5 @@
 <?php
-namespace Makasim\Values;
+namespace Formapro\Values;
 
 trait ChangedValuesTrait
 {

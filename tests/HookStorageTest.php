@@ -1,20 +1,20 @@
 <?php
-namespace Makasim\Values\Tests;
+namespace Formapro\Values\Tests;
 
-use function Makasim\Values\add_object;
-use function Makasim\Values\add_value;
-use function Makasim\Values\build_object;
-use function Makasim\Values\build_object_ref;
-use function Makasim\Values\get_object;
-use function Makasim\Values\get_value;
-use Makasim\Values\HooksEnum;
-use Makasim\Values\HookStorage;
-use function Makasim\Values\set_object;
-use function Makasim\Values\set_objects;
-use function Makasim\Values\set_value;
-use function Makasim\Values\set_values;
-use Makasim\Values\Tests\Model\EmptyObject;
-use Makasim\Values\Tests\Model\SubObject;
+use function Formapro\Values\add_object;
+use function Formapro\Values\add_value;
+use function Formapro\Values\build_object;
+use function Formapro\Values\build_object_ref;
+use function Formapro\Values\get_object;
+use function Formapro\Values\get_value;
+use Formapro\Values\HooksEnum;
+use Formapro\Values\HookStorage;
+use function Formapro\Values\set_object;
+use function Formapro\Values\set_objects;
+use function Formapro\Values\set_value;
+use function Formapro\Values\set_values;
+use Formapro\Values\Tests\Model\EmptyObject;
+use Formapro\Values\Tests\Model\SubObject;
 use PHPUnit\Framework\TestCase;
 
 class HookStorageTest extends TestCase

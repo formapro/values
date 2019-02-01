@@ -1,5 +1,5 @@
 <?php
-namespace Makasim\Values;
+namespace Formapro\Values;
 
 /**
  * @param object|string $objectOrClass

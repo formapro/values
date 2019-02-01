@@ -1,7 +1,7 @@
 <?php
-namespace Makasim\Values;
+namespace Formapro\Values;
 
-call_user_func(function() {
+function register_object_hooks() {
     $resetObjectsHook = function($object, $key) {
         call($object, $key, function($key) {
             if (property_exists($this, 'objects')) {
@@ -17,11 +17,9 @@ call_user_func(function() {
             $this->objects = [];
         });
     });
-});
-
-function register_object_hooks() {
-    // does nothing, is kept for BC. will be removed later.
 }
+
+register_object_hooks();
 
 /**
  * @param object      $context

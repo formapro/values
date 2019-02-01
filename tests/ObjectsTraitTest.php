@@ -1,20 +1,20 @@
 <?php
-namespace Makasim\Values\Tests;
+namespace Formapro\Values\Tests;
 
-use function Makasim\Values\clone_object;
-use function Makasim\Values\get_object;
-use function Makasim\Values\get_objects;
-use function Makasim\Values\get_values;
-use function Makasim\Values\get_object_changed_values;
-use Makasim\Values\HooksEnum;
-use Makasim\Values\HookStorage;
-use function Makasim\Values\register_hook;
-use function Makasim\Values\register_object_hooks;
-use function Makasim\Values\set_values;
-use Makasim\Values\Tests\Model\EmptyObject;
-use Makasim\Values\Tests\Model\ObjectInterface;
-use Makasim\Values\Tests\Model\OtherSubObject;
-use Makasim\Values\Tests\Model\SubObject;
+use function Formapro\Values\clone_object;
+use function Formapro\Values\get_object;
+use function Formapro\Values\get_objects;
+use function Formapro\Values\get_values;
+use function Formapro\Values\get_object_changed_values;
+use Formapro\Values\HooksEnum;
+use Formapro\Values\HookStorage;
+use function Formapro\Values\register_hook;
+use function Formapro\Values\register_object_hooks;
+use function Formapro\Values\set_values;
+use Formapro\Values\Tests\Model\EmptyObject;
+use Formapro\Values\Tests\Model\ObjectInterface;
+use Formapro\Values\Tests\Model\OtherSubObject;
+use Formapro\Values\Tests\Model\SubObject;
 use PHPUnit\Framework\TestCase;
 
 class ObjectsTraitTest extends TestCase

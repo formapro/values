@@ -1,5 +1,5 @@
 <?php
-namespace Makasim\Values\Tests\Model;
+namespace Formapro\Values\Tests\Model;
 
 class SubObject extends EmptyObject
 {
