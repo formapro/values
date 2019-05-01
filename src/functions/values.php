@@ -214,28 +214,58 @@ function clone_object($object)
     return build_object(get_class($object), get_values($object, true));
 }
 
-function register_cast_hooks($objectOrClass = null) {
-    $castValueHook = function($object, $key, $value) {
-        return (function($key, $value) {
-            if (method_exists($this, 'castValue')) {
-                return $this->castValue($value);
-            }
-        })->call($object, $key, $value);
-    };
+class CastHooks {
+    private static $castValueHook;
 
-    $castToHook = function($object, $key, $value, $default, $castTo) {
-        return (function($key, $value, $default, $castTo) {
-            if (method_exists($this, 'cast')) {
-                return $castTo ? $this->cast($value, $castTo) : $value;
-            }
-        })->call($object, $key, $value, $default, $castTo);
-    };
+    private static $castToHook;
+
+    public static function getCastValueHook(): \Closure
+    {
+        if (static::$castValueHook === null) {
+            static::$castValueHook = function($object, $key, $value) {
+                return (function($key, $value) {
+                    if (method_exists($this, 'castValue')) {
+                        return $this->castValue($value);
+                    }
+                })->call($object, $key, $value);
+            };
+        }
+
+        return static::$castValueHook;
+    }
+
+    public static function getCastToHook(): \Closure
+    {
+        if (static::$castToHook === null) {
+            static::$castToHook = function($object, $key, $value, $default, $castTo) {
+                return (function($key, $value, $default, $castTo) {
+                    if (method_exists($this, 'cast')) {
+                        return $castTo ? $this->cast($value, $castTo) : $value;
+                    }
+                })->call($object, $key, $value, $default, $castTo);
+            };
+        }
+
+        return static::$castToHook;
+    }
+
+}
+
+function register_cast_hooks($objectOrClass = null){
+    $castValueHook = CastHooks::getCastValueHook();
+    $castToHook = CastHooks::getCastToHook();
 
     if ($objectOrClass) {
         register_hook($objectOrClass, HooksEnum::PRE_SET_VALUE, $castValueHook);
         register_hook($objectOrClass, HooksEnum::PRE_ADD_VALUE, $castValueHook);
         register_hook($objectOrClass, HooksEnum::POST_GET_VALUE, $castToHook);
     } else {
+        foreach (get_registered_hooks('_', HooksEnum::PRE_SET_VALUE) as $callback) {
+            if ($castValueHook === $callback) {
+                break;
+            }
+        }
+
         register_global_hook(HooksEnum::PRE_SET_VALUE, $castValueHook);
         register_global_hook(HooksEnum::PRE_ADD_VALUE, $castValueHook);
         register_global_hook(HooksEnum::POST_GET_VALUE, $castToHook);
