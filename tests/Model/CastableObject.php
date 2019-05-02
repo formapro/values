@@ -1,8 +1,8 @@
 <?php
-namespace Makasim\Values\Tests\Model;
+namespace Formapro\Values\Tests\Model;
 
-use Makasim\Values\CastTrait;
-use function Makasim\Values\register_cast_hooks;
+use Formapro\Values\CastTrait;
+use function Formapro\Values\register_cast_hooks;
 
 class CastableObject extends EmptyObject
 {

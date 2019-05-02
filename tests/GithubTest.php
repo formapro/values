@@ -1,13 +1,13 @@
 <?php
-namespace Makasim\Values\Tests;
+namespace Formapro\Values\Tests;
 
-use function Makasim\Values\get_values;
-use function Makasim\Values\set_values;
-use Makasim\Values\Tests\Model\Github\Gist;
-use Makasim\Values\Tests\Model\Github\GistFile;
-use Makasim\Values\Tests\Model\Github\Owner;
-use Makasim\Values\Tests\Model\Github\RepositoryV1;
-use Makasim\Values\Tests\Model\Github\RepositoryV2;
+use function Formapro\Values\get_values;
+use function Formapro\Values\set_values;
+use Formapro\Values\Tests\Model\Github\Gist;
+use Formapro\Values\Tests\Model\Github\GistFile;
+use Formapro\Values\Tests\Model\Github\Owner;
+use Formapro\Values\Tests\Model\Github\RepositoryV1;
+use Formapro\Values\Tests\Model\Github\RepositoryV2;
 use PHPUnit\Framework\TestCase;
 
 class GithubTest extends TestCase

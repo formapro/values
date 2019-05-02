@@ -1,4 +1,16 @@
+
+<h2 align="center">Supporting Opensource</h2>
+
+`formapro\values` is an MIT-licensed open source project with its ongoing development made possible entirely by the support of community and our customers. If you'd like to join them, please consider:
+
+- [Become our client](http://forma-pro.com/)
+- [Become a sponsor](https://www.patreon.com/makasim)
+
+---
+
+
 [![Build Status](https://travis-ci.org/makasim/values.png?branch=master)](https://travis-ci.org/makasim/values)
+
 
 # Your "alter ego" objects
 
@@ -8,9 +20,10 @@ The array is easy to fetch out or set into of the object.
 
 Could be used:
 
-* with [MongoDB](https://www.mongodb.com/) as [lightweight (yet powerful) ODM](https://github.com/makasim/yadm).
-* with API by working with object but able to get arrays.
-* with message queues same as API.
+* interacting with [MongoDB](https://www.mongodb.com/) - [makasim/yadm](https://github.com/makasim/yadm).
+* describing API clients - [formapro/telegram-bot](https://github.com/formapro/telegram-bot-php).
+* describing domain models - [formapro/pvm](https://github.com/formapro/pvm)
+* describing MQ messages.
 
 **An object** provide us with a contract which is easy to rely on. We can type hint a class, use auto complete on its methods.
 That's a good part, but it is not easy or cheap to populate objects with data or take their current state. 
@@ -30,9 +43,9 @@ Here's the [real response](https://api.github.com/repos/symfony/symfony), we wil
 <?php
 namespace Acme;
 
-use Makasim\Values\ValuesTrait;
-use Makasim\Values\ObjectsTrait;
-use function Makasim\Values\set_values;
+use Formapro\Values\ValuesTrait;
+use Formapro\Values\ObjectsTrait;
+use function Formapro\Values\set_values;
 
 class Repo
 {
@@ -96,8 +109,8 @@ Lets create Gist and GistFile object. Populate them with data and get it as arra
 <?php
 namespace  Acme;
 
-use Makasim\Values\ObjectsTrait;
-use Makasim\Values\ValuesTrait;
+use Formapro\Values\ObjectsTrait;
+use Formapro\Values\ValuesTrait;
 
 class Gist
 {
@@ -153,6 +166,14 @@ get_values($gist);
 
 // now you can send it to api. 
 ```
+
+## Developed by Forma-Pro
+
+Forma-Pro is a full stack development company which interests also spread to open source development. 
+Being a team of strong professionals we have an aim an ability to help community by developing cutting edge solutions in the areas of e-commerce, docker & microservice oriented architecture where we have accumulated a huge many-years experience. 
+Our main specialization is Symfony framework based solution, but we are always looking to the technologies that allow us to do our job the best way. We are committed to creating solutions that revolutionize the way how things are developed in aspects of architecture & scalability.
+
+If you have any questions and inquires about our open source development, this product particularly or any other matter feel free to contact at opensource@forma-pro.com
 
 ## License
 

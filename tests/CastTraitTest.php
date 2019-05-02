@@ -1,9 +1,9 @@
 <?php
-namespace Makasim\Values\Tests;
+namespace Formapro\Values\Tests;
 
-use function Makasim\Values\get_object_changed_values;
-use function Makasim\Values\get_values;
-use Makasim\Values\Tests\Model\CastableObject;
+use function Formapro\Values\get_object_changed_values;
+use function Formapro\Values\get_values;
+use Formapro\Values\Tests\Model\CastableObject;
 use PHPUnit\Framework\TestCase;
 
 class CastTraitTest extends TestCase

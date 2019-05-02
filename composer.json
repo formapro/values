@@ -1,12 +1,13 @@
 {
-  "name": "makasim/values",
+  "name": "formapro/values",
   "type": "library",
-  "description": "An alter ego object. It is an object and an array at the same time",
+  "description": "Alter ego objects. Highly efficient way of building models, api clients and so on",
+
   "keywords": ["model"],
   "license": "MIT",
   "authors": [
     {
-      "name": "Maksym Kotliar",
+      "name": "Max Kotliar",
       "email": "kotlyar.maksim@gmail.com"
     }
   ],
@@ -20,11 +21,11 @@
     "bin-dir": "bin"
   },
   "autoload": {
-    "psr-4": { "Makasim\\Values\\": "src" },
+    "psr-4": { "Formapro\\Values\\": "src" },
     "files": ["src/functions_include.php"]
   },
   "autoload-dev": {
-    "psr-4": { "Makasim\\Values\\Tests\\": "tests" }
+    "psr-4": { "Formapro\\Values\\Tests\\": "tests" }
   },
   "extra": {
     "branch-alias": {

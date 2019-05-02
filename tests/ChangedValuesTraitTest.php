@@ -1,9 +1,9 @@
 <?php
-namespace Makasim\Values\Tests;
+namespace Formapro\Values\Tests;
 
-use function Makasim\Values\clone_object;
-use function Makasim\Values\set_values;
-use Makasim\Values\Tests\Model\EmptyObject;
+use function Formapro\Values\clone_object;
+use function Formapro\Values\set_values;
+use Formapro\Values\Tests\Model\EmptyObject;
 use PHPUnit\Framework\TestCase;
 
 class ChangedValuesTraitTest extends TestCase

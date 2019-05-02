@@ -1,6 +1,6 @@
 <?php
 
-namespace Makasim\Values;
+namespace Formapro\Values;
 
 class HooksEnum
 {
